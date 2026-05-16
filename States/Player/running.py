@@ -1,6 +1,7 @@
 import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
+from game import engine
 from statemachine import State
 
 class Running(State):
@@ -58,8 +59,6 @@ class Running(State):
         # draw surface
         self.parent_node.draw_surface(position=self.parent_node.hurtbox.center)
 
-        self.parent_node.weapon.update()
-
         # end condition
         if sum(self.parent_node.movementx) == 0 and sum(self.parent_node.movementy) == 0:
 
@@ -88,9 +87,6 @@ class Running(State):
 
             if event.key == pygame.K_e:
                 self.parent_node.is_interacting = True
-
-            if event.key == pygame.K_1:
-                self.parent_node.swap_weapon()
 
         if event.type == pygame.KEYUP:
 

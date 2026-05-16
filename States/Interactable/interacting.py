@@ -17,7 +17,8 @@ class Interacting(State):
 
 
         # set sprite sheet to be idle animation
-        self.timer_limit = self.parent_node.interact_time_limit
+
+        self.timer_limit = 2
         self.timer_init()
         
 
@@ -29,6 +30,7 @@ class Interacting(State):
         # run move and collide, end condition is in here
         self.parent_node.move_and_collide()
 
+
         # check if player is in colliding objects
         # if engine.player in self.parent_node.surrounding_game_objects:
         #     pass
@@ -39,7 +41,6 @@ class Interacting(State):
         if self.timer_complete:
 
             self.parent_node.pay(gameobj=engine.player)
-
             self.emit('IDLE')
 
         elif not engine.player.is_interacting:

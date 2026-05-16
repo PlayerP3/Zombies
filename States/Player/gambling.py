@@ -1,6 +1,7 @@
 import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
+from game import engine
 from statemachine import State
 
 class Gambling(State):

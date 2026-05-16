@@ -48,8 +48,6 @@ class Idle(State):
         self.parent_node.draw_surface(position=self.parent_node.hurtbox.center)
         self.parent_node.draw_rect(position=self.parent_node.hurtbox.center)
 
-        self.parent_node.weapon.update()
-
         self.end_condition()
 
     def handle_event(self, event):
@@ -85,12 +83,6 @@ class Idle(State):
 
             if event.key == pygame.K_e:
                 self.parent_node.is_interacting = True
-
-            if event.key == pygame.K_1:
-                self.parent_node.swap_weapon()
-
-            # if event.key == pygame.K_m:
-            #     engine.camera.change_focus = True
     
         if event.type == pygame.KEYUP:
 
