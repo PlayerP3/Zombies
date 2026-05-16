@@ -1,0 +1,19 @@
+{
+    "Interactable":
+
+        {
+            "zlayer_drawing":0,
+            "rect_colour":"blue",
+            "object_of_origin":"Interactable",
+            "name":"Default",
+
+            "img_path":"Sprites/Cards/Hearts/9.png",
+            "img_width":23,
+            "img_height":36,
+            "hurtbox_width":50,
+            "hurtbox_height":50,
+            "sprite_offsety":0,
+
+            "allowed_collisions":["Wall","Circles","Bullet"]
+        }
+}

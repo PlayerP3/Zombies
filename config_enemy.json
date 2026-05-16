@@ -1,0 +1,30 @@
+{
+    "Enemy":
+
+        {
+            "zlayer_drawing":0,
+            "rect_colour":"blue",
+            "object_of_origin":"Enemy",
+            "name":"Default",
+
+            "img_path":"Sprites/Cards/Hearts/9.png",
+            "img_width":23,
+            "img_height":36,
+            "hurtbox_width":13,
+            "hurtbox_height":20,
+            "sprite_offsety":-8,
+
+            "health":100,
+            "acceleration":1,
+            "decceleration_rate":1,
+            "speed":100,
+            "damage":10,
+            "allowed_collisions":["Wall","Circles","Bullet"],
+
+            "movement_raycast_init":{
+            "casted_rays":3,
+            "raycast_depth":150,
+            "raycast_width":60
+            }
+        }
+}

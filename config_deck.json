@@ -1,0 +1,30 @@
+{
+    "Hearts":{
+
+        "name":"Deck Of Hearts",
+        "suit_effect":"healing",
+        "suit_effect_value":10,
+        "suit_effect_proc_chance":10
+
+        
+                    },
+
+    "Spades":{
+
+        "name":"Deck Of Spades",
+        "suit_effect":"damage up",
+        "suit_effect_value":2,
+        "suit_effect_proc_chance":10
+        
+                    },
+
+
+    "projectile_attributes":{
+
+        "Card":{
+                
+                "homing":false,
+                "movement_type":"sine"
+        }
+    }
+}

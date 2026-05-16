@@ -1,0 +1,76 @@
+# x = [0,1,2,3,4]
+
+# print(x[-2:])
+
+# x.insert(-2,2)
+
+# print(x)
+
+# y = []
+
+# y = [a for a in y if a]
+
+# print(y)
+
+
+# from utils import *
+
+# x = calculate_manhattan((0,0),(16,32))
+
+# print(x)
+
+# print(25//32)
+
+# print(2==1.0)
+
+# print((Vector2(16,16)-Vector2(48,48)).length())
+
+class XY():
+
+    def __init__(self):
+        self.num =23
+        pass
+
+    def pp(self):
+        print(self.num)
+
+    def ww(self):
+        print(self.num)
+
+
+class OOO():
+
+    def __init__(self):
+        self.num = 8394083429872349
+        pass
+        
+    def pp(self):
+
+        print(self.num)
+
+    def ww(self):
+        print(self.num)
+
+
+a = XY()
+b = OOO()
+
+
+funcs = []
+
+funcs.append(a.pp)
+funcs.append(b.pp)
+
+funcs.append(XY().ww)
+funcs.append(OOO().ww)
+
+
+for i in funcs:
+    i()
+
+l = {'kk':XY()}
+
+l['kk'].num = 2020290981746739846972438248
+
+l['kk'].ww()
+

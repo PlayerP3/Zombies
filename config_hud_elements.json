@@ -1,0 +1,97 @@
+{
+    "CurrentHealthHUD":{
+        "zlayer_drawing":6,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/HealthBars/HealthBarFull.png",
+        "img_width":32,
+        "img_height":4,
+        "img_width_scale":5,
+        "img_height_scale":5,
+
+        "vertice":"topleft",
+    
+        "win_pos":[-448,-256]},
+
+    "CurrentHealthTextHUD":{
+        "zlayer_drawing":7,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthTextHUD",
+
+        "img_path":"0",
+        "img_width":10,
+        "img_height":23,
+        "img_width_scale":1,
+        "img_height_scale":1,
+
+        "is_text":true,
+
+        "vertice":"center",
+    
+        "win_pos":[-360,-245]},
+
+    
+    "EmptyHealthHUD":{
+        "zlayer_drawing":5,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"EmptyHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/HealthBars/HealthBarEmpty.png",
+        "img_width":32,
+        "img_height":4,
+        "img_width_scale":5,
+        "img_height_scale":5,
+
+        "vertice":"topleft",
+    
+        "win_pos":[-448,-256]},
+
+
+    "CurrentCardHUD":{
+        "zlayer_drawing":6,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"EmptyHealthHUD",
+
+        "img_path":"Sprites/Cards/Hearts/A.png",
+        "img_width":23,
+        "img_height":36,
+        "img_width_scale":4,
+        "img_height_scale":4,
+
+        "vertice":"center",
+    
+        "win_pos":[352,160]},
+
+
+    "DefaultCardHUD":{
+        "zlayer_drawing":5,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"EmptyHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/PokerCards/Default.png",
+        "img_width":23,
+        "img_height":36,
+        "img_width_scale":4,
+        "img_height_scale":4,
+
+        "vertice":"center",
+    
+        "win_pos":[352,160]}
+
+}

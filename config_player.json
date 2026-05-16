@@ -1,0 +1,63 @@
+{
+    "zlayer_drawing":1,
+    "rect_colour":"red",
+    "object_of_origin":"Player",
+    "hurtbox_width":13,
+    "hurtbox_height":20,
+    "sprite_offsety":-8,
+    "name":"Player",
+
+    "img_path":"Sprites/Cards/Hearts/A.png",
+    "img_width":23,
+    "img_height":36,
+
+    "health":10,
+    "acceleration":1,
+    "decceleration_rate":1,
+    "speed":150,
+    "damage":10,
+    "allowed_collisions":["Wall","Circles","Bullet"],
+    "x_metres_before_collision_detection":100,
+
+    "movement_raycast_init":{
+        "casted_rays":180,
+        "raycast_depth":150,
+        "raycast_width":50
+        },
+
+
+    "starter_deck":{
+
+        "magazine_size":16,
+        "ranks":["A","K","Q","J","1","2","3","4"],
+        "suits":["Hearts","Diamonds"],
+        "casted_rays":3,
+        "raycast_depth":300,
+        "raycast_width":60,
+        "fire_rate":10,
+        "reload_speed":7,
+
+        "projectile_attributes":{
+            "Card":{
+
+                "img_width":23,
+                "img_height":36,
+                "hurtbox_width":32,
+                "hurtbox_height":32,
+                "speed":200,
+                "sine_movement_amplitude":1,
+                "img_width_scale":1,
+                "img_height_scale":1,
+                "object_of_origin":"Player",
+                "movement_type":"normal",
+                "timer_limit":200,
+                "rotation_speed":0,
+                "damage":50,
+                "zlayer_drawing":-1
+                
+                
+            }
+        }
+    }
+
+}

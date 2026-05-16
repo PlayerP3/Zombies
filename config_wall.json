@@ -1,0 +1,24 @@
+{
+    "Generic": 
+    
+        {"zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":32,
+        "rect_height":32,
+        "name":"Environment",
+
+        "img_path":"Sprites/Walls/Generic/Wall.png",
+        "img_width":32,
+        "img_height":32,
+
+        "health":10,
+        "acceleration":1,
+        "decceleration_rate":1,
+        "speed":0,
+        "damage":0,
+        "allowed_collisions":["Wall","Circles","Bullet"]
+
+}
+
+}
