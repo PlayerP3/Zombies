@@ -15,8 +15,9 @@ class Gameplay(State):
     def enter(self):
 
         self.parent_node.hud.activate_hud_elements(['PlayerHealth','RoundNumber','Ammo','Points'])
-        self.parent_node.hud.deactivate_hud_elements(['Splash'])
+        self.parent_node.hud.deactivate_hud_elements(['Splash','Pause'])
 
+        self.parent_node.camera.pos = self.parent_node.player.hurtbox.center
         self.parent_node.camera.focus = self.parent_node.player.hurtbox.center
         self.parent_node.camera.track_object_spring(window=self.parent_node.windows.win)
 
@@ -53,7 +54,7 @@ class Gameplay(State):
 
     def handle_event(self, event):
 
-        # if the actual X is clicked to close the tab
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit(0)
+        if event.type == pygame.KEYDOWN:
+
+            if event.key == pygame.K_ESCAPE:
+                self.emit('PAUSED')

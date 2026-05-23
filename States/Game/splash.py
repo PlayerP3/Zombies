@@ -3,7 +3,6 @@ import json
 from pygame.math import Vector2
 from statemachine import State
 
-
 class Splash(State):
 
     def __init__(self):
@@ -17,8 +16,9 @@ class Splash(State):
        # here when in splash can set mouse visibility to off until we get to selections creen
        # but for now splash is selection screen
 
+        self.parent_node.camera.pos = (0,0)
         self.parent_node.hud.activate_hud_elements(['Splash'])
-        self.parent_node.hud.deactivate_hud_elements(['PlayerHealth','RoundNumber','Ammo','Points'])
+        self.parent_node.hud.deactivate_hud_elements(['PlayerHealth','RoundNumber','Ammo','Points','Pause'])
 
         
 
@@ -37,8 +37,9 @@ class Splash(State):
         # fill window
         self.parent_node.windows.win.fill((0,0,0))
 
-        # subsample circle
-        self.parent_node.camera.focus = self.parent_node.player.hurtbox.center
+        # self.parent_node.camera.focus = self.parent_node.player.hurtbox.center
+        self.parent_node.camera.focus = (0,0)
+
         self.parent_node.camera.track_object_spring(window=self.parent_node.windows.win)
 
         # display hud
