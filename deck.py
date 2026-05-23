@@ -5,9 +5,9 @@ from game import engine
 from weapon import *
 from utils import *
 from statemachine import StateMachine
-from States.Deck.idle import Idle
-from States.Deck.reloading import Reloading
-from States.Deck.shooting import Shooting
+from States.Gun.idle import Idle
+from States.Gun.reloading import Reloading
+from States.Gun.shooting import Shooting
 
 
 # load files in
@@ -54,7 +54,7 @@ class Card(Bullet):
     
         
 
-    def run_behaviour(self):
+    def update(self):
         
         # only show the orbital and draw it if it is active
         if self.is_active:
@@ -110,7 +110,6 @@ class DeckStateMachine(StateMachine):
         if self.state.done:
 
             self.transition_to_next_state()
-
             
         self.state.update()
 
@@ -236,10 +235,10 @@ class Deck(Weapon,DeckStateMachine):
             for i in range(len(self.final_endpoints)):
 
                 # set a bullet to be the first thing in the inacitve pool
-                bullet = OnShotEffectInactivePools[bullet_object].inactive_pool[i]
+                bullet = engine.inactive_pool[bullet_object][i]
 
                 # third conditional means we only ever try to run this code if there is atually a bullet in the inactive pool to use
-                if not bullet.is_active and not bullet.fired and OnShotEffectInactivePools[bullet_object].inactive_pool: # second condiitonal prevents bullet being fired twice until reload. this is important because after bullets collided they are sent back to the inactive pool, but we dont want inactive bullets that have already been fired
+                if not bullet.is_active and not bullet.fired and engine.inactive_pool[bullet_object]: # second condiitonal prevents bullet being fired twice until reload. this is important because after bullets collided they are sent back to the inactive pool, but we dont want inactive bullets that have already been fired
 
                     # set projectile manager
                     bullet.projectile_manager = self
@@ -293,7 +292,7 @@ class Deck(Weapon,DeckStateMachine):
                     self.projectile_queue.append(bullet)
                     
                     # remove bullet obj from inactive pool
-                    OnShotEffectInactivePools[bullet_object].inactive_pool.remove(bullet)
+                    engine.inactive_pool[bullet_object].remove(bullet)
 
                     # remove one from the display ammo because a bullet has been shot
                     self.bullets_remaining_in_mag -= 1
@@ -316,17 +315,11 @@ class Deck(Weapon,DeckStateMachine):
         self.current_card = self.deck_of_cards[0]
         self.used_deck_of_cards = []
 
-# This is a pool of card objects 
-class CardPool():
-
-    def __init__(self):
-
-        self.inactive_pool = [Card() for _ in range(300)]
 
 
 
 # add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
-OnShotEffectInactivePools["Card"] = CardPool()
+engine.inactive_pool["Card"] = [Card() for _ in range(300)]
 
 
 

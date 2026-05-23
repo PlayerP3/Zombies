@@ -3,6 +3,24 @@ import pygame,math
 from pygame.math import Vector2
 from game import engine
 
+# given a dictionary of stat value pairs, change hte value of the stats with getattr
+def set_attributes(game_object,attributes:dict):
+
+    for att,val in attributes.items():
+        setattr(game_object,att,val)
+
+# given a dictionary of stat value pairs, change hte value of the stats with getattr
+def store_original_vars(game_object):
+
+    game_object.original_vars = {k:v for k,v in game_object.__dict__.items()}
+
+# function to link set attirbutes, init and storing original values on obj start
+def start(game_object,attributes:dict):
+
+    set_attributes(game_object=game_object,attributes=attributes)
+    game_object.init()
+    store_original_vars(game_object=game_object)
+
 # clamp function, return value not lower and not higher than min.max
 def clamp(n:float, min:float, max:float) -> float:
     if n < min:
@@ -76,10 +94,6 @@ def proc_using_weights(ItemWeights:dict):
         else: # update previous chance
                 previous_chance = next_chance
 
-# use function and timer to map a variable to a sine function/wave
-def map_var_to_sine_wave(timer:Timer,freq=1,amp=2):
-
-    return math.sin(timer.elapsed_time*freq)*amp
 
 # linear interpolation value
 # t is the fraction of time that has elapsed, start is the start value, end is the end value we want to reach
@@ -169,8 +183,13 @@ def reposition_rect(rect:list,point:tuple=(0,0),tile_size:int=32) -> list:
 
     return [new_x,new_y,w,h]
 
+# return random point in a circle of X radius and (x,y) center
+def sample_random_point_circle(radius:float,circle_center:tuple):
 
+        random_angle = random.randint(0,359)
 
+        # return point on circle at that angle
+        return (circle_center[0] + (radius * math.cos(math.radians(random_angle))),circle_center[1] + (radius * math.sin(math.radians(random_angle))))
 
 # find the centre of a tile
 def find_tile_centre(point:tuple,tile_width=32,tile_height=32):
@@ -655,106 +674,6 @@ def draw_lines(points:tuple=[(0,0),(1,1)],asset_to_draw=None,asset_type:str='lin
 #         else: # update previous chance
 #                 previous_chance = next_chance
 
-
-
-# classes
-class Timer():
-
-    def __init__(self,timer_speed:float=1,timer_limit:float=3,timer_replay:bool=False):
-
-        self.current_time = 0
-        self.start_time = 0
-        self.elapsed_time = 0
-        self.elapsed_time_fraction = 0
-        self.timer_limit = timer_limit
-        self.timer_speed = timer_speed
-        self.timer_running = True
-        self.timer_complete = False
-        self.paused_time = 0
-        
-        # time replaying
-        self.timer_replay = timer_replay
-
-    def timer_init(self):
-        
-        # if self.timer_complete:
-        self.current_time = pygame.time.get_ticks()/1000
-        self.start_time = pygame.time.get_ticks()/1000
-        self.elapsed_time = 0
-        self.elapsed_time_fraction = 0
-        self.timer_running = True
-        self.timer_complete = False
-
-    def pause_timer(self):
-        self.paused_time = self.start_time
-
-    def resume_timer(self):
-        self.elapsed_time += self.paused_time
-
-    def run_timer(self):
-
-        # if timer isnt complete
-        if self.timer_running:
-
-            # update current time
-            self.current_time = pygame.time.get_ticks()/1000
-
-            # get elapsed time
-            self.elapsed_time = self.current_time - self.start_time
-
-            if self.timer_limit > 0 and self.timer_speed > 0:
-                self.elapsed_time_fraction = self.elapsed_time/(self.timer_limit/self.timer_speed)
-
-
-            if self.elapsed_time >= (self.timer_limit/self.timer_speed):
-
-                self.timer_running = False
-
-                # if replay
-                if self.timer_replay:
-
-                    # set timer complete to false so it keeps on running 
-                    self.timer_running = True
-                    self.start_time = pygame.time.get_ticks()/1000
-                    self.current_time = pygame.time.get_ticks()/1000
-
-
-                self.timer_complete = True
-
-            else:
-                self.timer_complete = False
-
-TimerInactivePool = [Timer() for i in range(400)]
-
-class TimerManager():
-
-    def __init__(self):
-
-        self.active_pool = []
-
-    def run_behaviour(self):
-
-        if self.active_pool:
-
-            to_remove = []
-
-            for gameobj in self.active_pool:
-
-                gameobj.run_behaviour()
-
-                if not gameobj.is_active:
-                    to_remove.append(gameobj)
-
-            if to_remove:
-
-                for gameobj in to_remove:
-
-                    self.active_pool.remove(gameobj)
-
-                    # add appropriate on shot effect manager
-                    TimerInactivePool.append(gameobj)
-
-TimerMgr = TimerManager()
 
 
 

@@ -1,7 +1,8 @@
 import json,random,sys
-from moveableobject import Moveable_Object,MiscellaneousMgr,MiscellaneousInactivePools
+from moveableobject import Moveable_Object
 from animatedsprite import AnimatedSprite
 from game import engine
+from utils import *
 from pygame.math import Vector2
 from statemachine import StateMachine
 from States.Interactable.idle import Idle
@@ -28,7 +29,7 @@ class InteractableStateMachine(StateMachine):
 
 class Interactable(Moveable_Object,InteractableStateMachine):
 
-    def __init__(self,cost:float=0,interact_time_limit:float=1):
+    def __init__(self,cost:float=0,interact_time_limit:float=2,display_message_text:str='Hold E To Interact'):
 
         Moveable_Object.__init__(self)
         InteractableStateMachine.__init__(self)
@@ -40,32 +41,22 @@ class Interactable(Moveable_Object,InteractableStateMachine):
         # returning true if something has interacted with it in the required way
         self.interact_time_limit = interact_time_limit
         self.display_message = AnimatedSprite()
+        self.display_message_text = display_message_text
         self.cost = cost
         self.is_active = False
         # self.progress_bar = ProgressBar(**progressbar_parameters['WallBuy'])
   
 
-    def init(self,attributes:dict={},pos:tuple=(0,0)):
-
-        self.spawn(pos)
-
-        for att,val in attributes.items():
-
-            setattr(self,att,val)
+    def init(self):
 
         # display message init
-        self.display_message.init_text_sprite(f"E")
+        self.display_message.is_text = True
+        self.display_message.img_path = 'E'
         self.display_message.init_sprite()
         self.display_message.hurtbox.center = (0,0)
         self.display_message.timer_limit = 1
 
-        self.init_sprite()
         self.hurtbox.center = (0,0)
-        self.display_message.timer_limit = 1
-
-        # update hurtbox size
-        self.hurtbox.width = self.hurtbox_width
-        self.hurtbox.height = self.hurtbox_height
 
         # init state machine
         self.states = {'IDLE':Idle(),
@@ -76,6 +67,8 @@ class Interactable(Moveable_Object,InteractableStateMachine):
             self.states[x].parent_node = self
         
         self.state = self.states['IDLE']
+
+        super().init()
 
     # handle collision once the check is confirmed
     def handle_collision(self,game_object:object,axis:str):
@@ -88,6 +81,7 @@ class Interactable(Moveable_Object,InteractableStateMachine):
 
             if game_object.__class__.__name__ == 'Player':
                     
+              
                 # display message
                 self.display_message.draw_surface(position=(self.hurtbox.topright[0]+3,self.hurtbox.topright[1]-3))
 
@@ -99,6 +93,8 @@ class Interactable(Moveable_Object,InteractableStateMachine):
                 elif not game_object.is_interacting:
                     self.state.emit('IDLE')
 
+    def update_data(self):
+        pass
   
     def run_effect(self,gameobj:object):
         pass
@@ -128,27 +124,24 @@ class Interactable(Moveable_Object,InteractableStateMachine):
                self.pay()
 
 
-# for soul boxes chekc if player is colliding AND enemies are in detah state
-
-
-# This is a pool of card objects 
-class InteractablePool():
-
-    def __init__(self):
-
-        self.inactive_pool = [Interactable() for _ in range(300)]
 
 
 
 # add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
-MiscellaneousInactivePools["Interactable"] = InteractablePool()
+engine.inactive_pool["Interactable"] = [Interactable() for _ in range(300)]
 
-miscobj = MiscellaneousInactivePools['Interactable'].inactive_pool[0]
+miscobj = engine.inactive_pool['Interactable'][0]
 
 # spawns = [(-48,-48),(-220,-100),(100,220),(500,100)]
 spawns = [(0,0)]
 
-miscobj.init(attributes=interactable_parameters['Interactable'],pos=random.choice(spawns))
+set_attributes(game_object=miscobj,attributes=interactable_parameters['Interactable'])
+miscobj.init()
+store_original_vars(game_object=miscobj)
 
-MiscellaneousMgr.active_pool.append(miscobj)
-MiscellaneousInactivePools['Interactable'].inactive_pool.remove(miscobj)
+
+miscobj.spawn(random.choice(spawns))
+
+engine.active_pool.append(miscobj)
+engine.inactive_pool['Interactable'].remove(miscobj)
+

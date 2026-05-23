@@ -3,6 +3,7 @@ from pygame.math import Vector2
 from raycast import Raycast
 from game import engine
 from animatedsprite import AnimatedSprite
+from globs import delta
 # from miscsprites import MiscellaneousInactivePools,MiscellaneousMgr
 from utils import *
 import random
@@ -18,7 +19,7 @@ class Moveable_Object(AnimatedSprite):
 
     def __init__(self,
                  
-                 health:float=1,acceleration:float=1,decceleration_rate:float=0,money:int=0,
+                 health:float=1,acceleration:float=1,decceleration_rate:float=0,money:int=0,moneyOnHit:int=10,moneyOnKill:int=50,
 
                  knockback_resistance:float=5,knockback_strength:float=1,overlap_resolution_resistance=5,overlap_resolution_strength:float=1,
 
@@ -45,8 +46,7 @@ class Moveable_Object(AnimatedSprite):
 
                  ranged_dot_effects:dict={}):
 
-        # init animated sprite
-        AnimatedSprite.__init__(self)
+        
 
         # store base stats in a dict
         self.base_stats = {'x_metres_before_collision_detection':x_metres_before_collision_detection,
@@ -90,6 +90,8 @@ class Moveable_Object(AnimatedSprite):
         self.min_acceleration = min_acceleration
         self.decceleration_rate = decceleration_rate
         self.stamina = stamina      
+
+
         
 
         # set knockback variable, if knocked back then accelration becomes this value
@@ -102,6 +104,10 @@ class Moveable_Object(AnimatedSprite):
 
         # set health
         self.health = health
+        
+        # total health
+        self.total_health = 1
+
         self.health_reset = health
         self.health_state = health_state # {100:1,40:2,0:3} # key is percentage of health remaining, value is the state which that leaves you in
 
@@ -134,6 +140,8 @@ class Moveable_Object(AnimatedSprite):
 
         # money
         self.money = money
+        self.moneyOnHit = moneyOnHit
+        self.moneyOnKill = moneyOnKill
 
         # immunity/invulnerability
         self.general_explosion_immunity = general_explosion_immunity
@@ -196,18 +204,23 @@ class Moveable_Object(AnimatedSprite):
         self.possible_enemy_collisions = []
         self.overlap_resolution_collisions = []
 
-
+        # init animated sprite
+        AnimatedSprite.__init__(self)
 
    
     # reinit
-    def init(self,attributes:dict={}):
-
-        for att,val in attributes.items():
-
-            setattr(self,att,val)
+    def init(self):
            
-        self.init_sprite(img_path=self.img_path,img_width=self.img_width,
-                         img_height=self.img_height)
+        self.hurtbox.width = self.hurtbox_width
+        self.hurtbox.height = self.hurtbox_height
+
+        self.movement_raycast.init(attributes=self.movement_raycast_init)
+
+        # set total health
+        self.total_health = self.health
+
+
+        super().init_sprite()
         
     def spread_overlapping_game_objects2(self):
 
@@ -273,7 +286,7 @@ class Moveable_Object(AnimatedSprite):
     # apply deceleration after the dash
     def apply_decceleration(self):
 
-        self.acceleration -= (engine.delta * self.decceleration_rate)
+        self.acceleration -= (delta * self.decceleration_rate)
 
         if self.acceleration < 0:
             self.acceleration = max(self.acceleration,0)
@@ -465,7 +478,7 @@ class Moveable_Object(AnimatedSprite):
     # update movement vectors array, use whenever setting both the direction vectors and acceleration
     # concept of unique id is that a single object can only apply a single vector to the moveable object
     def update_movement_vectors(self,unique_id:int,direction_vectorX:float,direction_vectorY:float,acceleration:float=1,
-                                Xcceleration_rate:float=engine.delta,Xcceleration_rate_change:str='positive',max_value:float=1,reduce_on_wall_collision:bool=False,
+                                Xcceleration_rate:float=delta,Xcceleration_rate_change:str='positive',max_value:float=1,reduce_on_wall_collision:bool=False,
                                 reset_on_max_value:bool=False,target_point:tuple = None) -> None:
 
         self.movement_vectors.update({unique_id:{"direction_vectorX":direction_vectorX,
@@ -575,16 +588,16 @@ class Moveable_Object(AnimatedSprite):
 
              # if only xvel or yvel is changed then set the other axis movement to be 0 because we want to move left, then check for a collision, and then move right and do the same
             if direction_vectorX !=0:
-                movementx = (Vector2(direction_vectorX,0).normalize()*engine.delta*self.speed*acceleration)
+                movementx = (Vector2(direction_vectorX,0).normalize()*delta*self.speed*acceleration)
 
             if direction_vectorY !=0:
-                movementy = (Vector2(0,direction_vectorY).normalize()*engine.delta*self.speed*acceleration)
+                movementy = (Vector2(0,direction_vectorY).normalize()*delta*self.speed*acceleration)
 
             # if both x and y are pressed, normalise the x and y values the player is going to move in.
             # when both x and y are pressed, the normalised value is different from if only one of those was pressed
             if direction_vectorX != 0 and direction_vectorY != 0:
 
-                move = Vector2(direction_vectorX,direction_vectorY).normalize()*engine.delta*self.speed*acceleration
+                move = Vector2(direction_vectorX,direction_vectorY).normalize()*delta*self.speed*acceleration
 
                 # separate into only x movement and only y movement
                 movementx = (move[0],0)
@@ -593,7 +606,7 @@ class Moveable_Object(AnimatedSprite):
             # adjust acceleration
             if Xcceleration_rate_change == 'positive':
 
-                acceleration += (engine.delta*Xcceleration_rate)
+                acceleration += (delta*Xcceleration_rate)
 
                 # update dictionary
                 movement_info["acceleration"] = acceleration
@@ -613,7 +626,7 @@ class Moveable_Object(AnimatedSprite):
 
             elif Xcceleration_rate_change == 'negative':
 
-                acceleration -= (engine.delta*Xcceleration_rate)
+                acceleration -= (delta*Xcceleration_rate)
 
                 # update dictionary
                 movement_info["acceleration"] = acceleration
@@ -891,16 +904,16 @@ class Moveable_Object(AnimatedSprite):
 
              # if only xvel or yvel is changed then set the other axis movement to be 0 because we want to move left, then check for a collision, and then move right and do the same
             if direction_vectorX !=0:
-                movementx = (Vector2(direction_vectorX,0).normalize()*engine.delta*self.speed*acceleration)
+                movementx = (Vector2(direction_vectorX,0).normalize()*delta*self.speed*acceleration)
 
             if direction_vectorY !=0:
-                movementy = (Vector2(0,direction_vectorY).normalize()*engine.delta*self.speed*acceleration)
+                movementy = (Vector2(0,direction_vectorY).normalize()*delta*self.speed*acceleration)
 
             # if both x and y are pressed, normalise the x and y values the player is going to move in.
             # when both x and y are pressed, the normalised value is different from if only one of those was pressed
             if direction_vectorX != 0 and direction_vectorY != 0:
 
-                move = Vector2(direction_vectorX,direction_vectorY).normalize()*engine.delta*self.speed*acceleration
+                move = Vector2(direction_vectorX,direction_vectorY).normalize()*delta*self.speed*acceleration
 
                 # separate into only x movement and only y movement
                 movementx = (move[0],0)
@@ -909,7 +922,7 @@ class Moveable_Object(AnimatedSprite):
             # adjust acceleration
             if Xcceleration_rate_change == 'positive':
 
-                acceleration += (engine.delta*Xcceleration_rate)
+                acceleration += (delta*Xcceleration_rate)
 
                 # update dictionary
                 movement_info["acceleration"] = acceleration
@@ -929,7 +942,7 @@ class Moveable_Object(AnimatedSprite):
 
             elif Xcceleration_rate_change == 'negative':
 
-                acceleration -= (engine.delta*Xcceleration_rate)
+                acceleration -= (delta*Xcceleration_rate)
 
                 # update dictionary
                 movement_info["acceleration"] = acceleration
@@ -1141,11 +1154,11 @@ class Moveable_Object(AnimatedSprite):
 
         if self.state.__class__.__name__ != 'Running':
 
-            self.stamina += engine.delta/2
+            self.stamina += delta/2
 
         if self.state.__class__.__name__ == 'Running':
 
-            self.stamina -= engine.delta
+            self.stamina -= delta
             
         self.stamina = np.clip(self.stamina,0,self.original_vars['stamina'])
 
@@ -1177,15 +1190,19 @@ class Moveable_Object(AnimatedSprite):
 
         # init damage number
         if engine.display_dmg_num == 1:
-            dmgnum = MiscellaneousInactivePools['DamageNumber'].inactive_pool[0]
+            dmgnum = engine.inactive_pool['DamageNumber'][0]
             dmgnum.init(f"{damage}")
             dmgnum.spawn(gameobj.hurtbox.center)
             dmgnum.update_movement_vectors(unique_id='movement',direction_vectorX=0,
                                             direction_vectorY=-1,acceleration=self.acceleration,Xcceleration_rate=0,
                                             Xcceleration_rate_change='negative',
                                             max_value=self.acceleration,reduce_on_wall_collision=False,reset_on_max_value=False)
-            MiscellaneousInactivePools['DamageNumber'].inactive_pool.remove(dmgnum)
-            MiscellaneousMgr.active_pool.append(dmgnum)
+            engine.inactive_pool['DamageNumber'].remove(dmgnum)
+            engine.active_pool.append(dmgnum)
+
+
+
+
 
 
     
@@ -1343,7 +1360,7 @@ class Moveable_Object(AnimatedSprite):
 # movement vector class
 class Movement_Vector():
         
-    def __init__(self,name:str='movement',direction_vectorX:float=0,direction_vectorY:float=0,acceleration:float=1,Xcceleration_rate:float=engine.delta,
+    def __init__(self,name:str='movement',direction_vectorX:float=0,direction_vectorY:float=0,acceleration:float=1,Xcceleration_rate:float=delta,
                     Xcceleration_rate_change:str='positive',reduce_on_wall_collision:bool=False,max_value:float=0,reset_on_max_value:bool='False',
                     target_point:tuple=None):
         
@@ -1386,48 +1403,6 @@ class Movement_Vector():
             target_point = movement_info["target_point"]
 
 
-
-
-
-
-
-# This will be for storing inactive pools of all bullet-like objects
-MiscellaneousInactivePools = {}
-
-# controls all type of shooting objects
-class MiscellaneousManager():
-    def __init__(self):
-
-        self.active_pool = []
-
-    def run_behaviour(self):
-
-        if self.active_pool:
-
-            to_remove = []
-
-            for gameobj in self.active_pool:
-
-                gameobj.update()
-
-                if not gameobj.is_active:
-                    to_remove.append(gameobj)
-
-            if to_remove:
-
-                for gameobj in to_remove:
-
-                    self.active_pool.remove(gameobj)
-
-                    # add appropriate on shot effect manager
-                    MiscellaneousInactivePools[gameobj.__class__.__name__].inactive_pool.append(gameobj)
-
-
-MiscellaneousMgr = MiscellaneousManager()
-
-
-
-
 # create damage number
 class DamageNumber(Moveable_Object):
 
@@ -1458,17 +1433,9 @@ class DamageNumber(Moveable_Object):
         # draw surface
         self.draw_surface(position=self.hurtbox.center)
         
-# This is a pool of card objects 
-class DamageNumberPool():
-
-    def __init__(self):
-
-        self.inactive_pool = [DamageNumber() for _ in range(300)]
-
-
 
 # add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
-MiscellaneousInactivePools["DamageNumber"] = DamageNumberPool()
+engine.inactive_pool["DamageNumber"] = [DamageNumber() for _ in range(300)]
 
 
 # code to show damage numbers

@@ -74,3 +74,58 @@ l['kk'].num = 2020290981746739846972438248
 
 l['kk'].ww()
 
+
+
+class BB():
+
+    def __init__(self):
+        
+        self.x = 32
+        self.y = None
+        self.z = None
+        self.original_vars = None
+
+    def init(self):
+
+        self.y = 90
+
+        self.original_vars = {k:v for k,v in self.__dict__.items()}
+
+class DD(BB):
+
+    def __init__(self):
+        pass
+
+    def init(self):
+
+        self.z = 13404040
+
+        return super().init()
+
+
+class CC(DD):
+
+    def __init__(self):
+        DD.__init__(self)
+
+
+    def init(self):
+        self.x = 1111
+        return super().init()
+        
+    
+
+
+x = CC()
+x.init()
+
+print(x.y)
+print(x.x)
+print(x.z)
+print(x.original_vars)
+
+
+import moveableobject
+
+x = {'class':'Wall'}
+

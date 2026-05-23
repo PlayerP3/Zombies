@@ -1,0 +1,53 @@
+{
+    "AssaultRifle":
+
+        {
+            "zlayer_drawing":0,
+            "rect_colour":"blue",
+            "object_of_origin":"Interactable",
+            "name":"AssaultRifle",
+            "effect":"weapon change",
+            "stat_val":"AssualtRifle",
+            "pos":[-300,200],
+            "interact_time_limit":0.4,
+
+            "img_path":"Sprites/Miscellaneous/WallBuys/AssaultRifle.png",
+            "hurtbox_width":50,
+            "hurtbox_height":50,
+
+            "display_item_init":{
+                "zlayer_drawing":0,
+                "img_path":"Sprites/Miscellaneous/WallBuys/AssaultRifle.png"
+            }
+        },
+
+
+    "Pistol":
+
+        {
+            "zlayer_drawing":0,
+            "rect_colour":"blue",
+            "object_of_origin":"Interactable",
+            "name":"Pistol",
+            "effect":"weapon change",
+            "stat_val":"Pistol",
+            "img_path":"Sprites/Miscellaneous/WallBuys/Pistol.png",
+
+            "hurtbox_width":40,
+            "hurtbox_height":40,
+            "pos":[400,200],
+
+            "allowed_collisions":["Wall","Circles","Bullet"],
+            "interact_time_limit":0.4,
+
+
+            "display_item_init":{
+                
+                "zlayer_drawing":0,
+                "img_path":"Sprites/Miscellaneous/WallBuys/Pistol.png"
+
+            }
+        }
+
+    
+}

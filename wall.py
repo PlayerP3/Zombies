@@ -1,6 +1,6 @@
 import json,sys
 from utils import *
-from moveableobject import Moveable_Object,MiscellaneousMgr
+from moveableobject import Moveable_Object
 
 with open('config_wall.json','r') as wall_attributes_file:
 
@@ -14,19 +14,9 @@ class Wall(Moveable_Object):
         Moveable_Object.__init__(self)
     
         
-    def init(self,attributes:dict={}):
+    def init(self):
 
-        if attributes:
-            for att,val in attributes.items():
-
-                setattr(self,att,val)
-        
-        # init sprite variables
-        self.init_sprite()
-
-        self.is_active = True
-
-        self.original_vars = {k:v for k,v in self.__dict__.items()}
+        super().init()
 
     
     # handle collision damage etc
@@ -112,12 +102,13 @@ class Wall(Moveable_Object):
 
 
 walle = Wall()
+
+set_attributes(game_object=walle,attributes=wall_parameters['Generic'])
+walle.init()
+store_original_vars(game_object=walle)
+
 walle.spawn((48,48))
-walle.hurtbox.width = 32
-walle.hurtbox.height = 32
 
+engine.active_pool.append(walle)
 
-walle.init(attributes=wall_parameters['Generic'])
-
-MiscellaneousMgr.active_pool.append(walle)
 

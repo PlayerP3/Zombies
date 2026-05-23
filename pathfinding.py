@@ -7,6 +7,7 @@ import random
 import sys
 import pygame
 from utils import *
+from timer import Timer
 from game import engine
 # from utils import *
 # from Drawing_TileMaps import engine

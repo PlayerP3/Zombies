@@ -6,6 +6,7 @@
     "hurtbox_height":20,
     "sprite_offsety":-8,
     "name":"Player",
+    "money":1000,
 
     "img_path":"Sprites/Cards/Hearts/A.png",
     "img_width":23,
@@ -34,8 +35,8 @@
         "casted_rays":3,
         "raycast_depth":300,
         "raycast_width":60,
-        "fire_rate":10,
-        "reload_speed":7,
+        "fire_rate":7,
+        "reload_speed":2,
 
         "projectile_attributes":{
             "Card":{

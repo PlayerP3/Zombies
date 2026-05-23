@@ -2,8 +2,9 @@ import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
 from pygame.event import Event
-from game import engine
-from utils import Timer,linear_lerp
+# from game import engine
+from eventsystem import eventprocessor
+from timer import Timer
 # from States.Player.idle import Idle
 
 
@@ -92,7 +93,7 @@ class State(Timer):
 
     def submit_event_processing(self):
 
-        engine.extra_event_processing.append(self.handle_event)
+        eventprocessor.extra_event_processing.append(self.handle_event)
 
 
 

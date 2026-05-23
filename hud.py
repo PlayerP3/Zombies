@@ -8,6 +8,7 @@ class HUD():
     def __init__(self):
 
         self.hud_elements = {}
+        self.active_elements = []
 
 
     def add_element(self,group:str,hud_element:HUD_element):
@@ -23,15 +24,44 @@ class HUD():
 
     def display_hud(self):
 
+        # get active elemnets
+        self.active_elements = []
+
         for group in self.hud_elements:
 
             for hud_element in self.hud_elements[group]:
 
+                
+
                 if hud_element.display:
 
-                    hud_element.draw_surface(position=hud_element.win_pos)
+                    hud_element.update()
+                    hud_element.draw_surface(position=hud_element.win_pos,ignore_offset=True)
+                    # draw rect for debugging 
+                    hud_element.draw_rect(position=hud_element.win_pos)
 
 
+                    self.active_elements.append(hud_element)
+
+    # give list of hud element groups and they will be turned off
+    def deactivate_hud_elements(self,groupNames:list):
+
+        for group in groupNames:
+
+            for hudElement in self.hud_elements[group]:
+
+                hudElement.display = False
+
+
+    # give list of hud element groups and they will be turned off
+    def activate_hud_elements(self,groupNames:list):
+
+        for group in groupNames:
+
+            for hudElement in self.hud_elements[group]:
+
+                hudElement.display = True
+        
 
 
 class HUD_element(AnimatedSprite):
@@ -51,6 +81,9 @@ class HUD_element(AnimatedSprite):
         self.linked_obj = None
         self.linked_var = None
 
+        # list of functions we will execute
+        self.extraProcessing = []
+
     # reinit
     def init(self,attributes:dict={}):
 
@@ -61,7 +94,21 @@ class HUD_element(AnimatedSprite):
         # init sprite variables
         self.init_sprite(SpriteCache=GameSprites)
 
+        self.hurtbox.width = self.hurtbox_width
+        self.hurtbox.height = self.hurtbox_height
+        self.hurtbox.center = self.win_pos
+
         self.original_vars = {k:v for k,v in self.__dict__.items()}
+
+    # function to update some preoprty about the hud
+    def update(self):
+
+        if self.extraProcessing:
+
+            for f in self.extraProcessing:
+
+                f(self)
+
 
 
 PlayingCardSprites = {}

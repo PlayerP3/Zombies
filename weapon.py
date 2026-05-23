@@ -3,6 +3,7 @@ from pygame.math import Vector2
 from moveableobject import Moveable_Object
 from game import engine
 from utils import *
+from timer import Timer
 from animatedsprite import AnimatedSprite
 # from statemachine import StateMachine
 
@@ -62,11 +63,7 @@ class Weapon():
         # store attributes for different projectiles
         self.projectile_attributes = {}
 
-    def init(self,attributes:dict={}):
-
-        for att,val in attributes.items():
-
-            setattr(self,att,val)
+    def init(self):
 
         # update bullets remainig in mag
         self.bullets_remaining_in_mag = self.magazine_size
@@ -74,31 +71,9 @@ class Weapon():
         # set speed for reload timer
         self.reloading_timer.timer_speed = self.reload_speed
         self.shooting_timer.timer_speed = self.fire_rate
-
-        
-        self.original_vars = {k:v for k,v in self.__dict__.items()}
-
     
     # reloading
     def reloading_ammo(self):
-
-        # if the player is reloading or there are no free bullets remaining  or not self.inactive_pool
-        if self.is_reloading:
-
-            # run timer
-            self.reloading_timer.run_timer()
-
-            # if the reload has finished then set reloading to false and add all the entities back to the inactive pool
-            if self.reloading_timer.timer_complete:
-
-                # set reloading to be false
-                self.is_reloading = False
-
-                # since it has reloaded update what the max ammo count currently is
-                self.managing_ammo_count()
-
-    # reloading
-    def reloading_ammo2(self):
 
         # run timer
         self.reloading_timer.run_timer()
@@ -106,8 +81,12 @@ class Weapon():
         # if the reload has finished then set reloading to false and add all the entities back to the inactive pool
         if self.reloading_timer.timer_complete:
 
+            # set reloading to be false
+            self.is_reloading = False
+
             # since it has reloaded update what the max ammo count currently is
             self.managing_ammo_count()
+
 
     # manage ammo count
     def managing_ammo_count(self):
@@ -329,16 +308,23 @@ class Weapon():
             for i in range(len(self.final_endpoints)):
 
                 # set a bullet to be the first thing in the inacitve pool
-                bullet = OnShotEffectInactivePools[bullet_object].inactive_pool[i]
+                bullet = engine.inactive_pool[bullet_object][i]
 
                 # third conditional means we only ever try to run this code if there is atually a bullet in the inactive pool to use
-                if not bullet.is_active and not bullet.fired and OnShotEffectInactivePools[bullet_object].inactive_pool: # second condiitonal prevents bullet being fired twice until reload. this is important because after bullets collided they are sent back to the inactive pool, but we dont want inactive bullets that have already been fired
+                if not bullet.is_active and not bullet.fired and engine.inactive_pool[bullet_object]: # second condiitonal prevents bullet being fired twice until reload. this is important because after bullets collided they are sent back to the inactive pool, but we dont want inactive bullets that have already been fired
 
                     # set projectile manager
                     bullet.projectile_manager = self
 
+                    set_attributes(game_object=bullet,attributes=self.projectile_attributes[bullet_object])
+
                     # init the projectile
                     bullet.init(self.projectile_attributes[bullet_object])
+
+                    store_original_vars(game_object=bullet)
+
+                    # active to false because when we init active is set to true by default
+                    bullet.is_active = False
 
                     bullet.pathing = 'regular'
 
@@ -346,8 +332,6 @@ class Weapon():
                     bullet.start_position = self.shooting_start_position
                     bullet.hurtbox.center = self.shooting_start_position
                     bullet.target_position = self.final_endpoints[i]
-
-                    
 
                     bullet.length_to_target = (Vector2(bullet.target_position) - Vector2(bullet.hurtbox.center)).length()
 
@@ -374,7 +358,7 @@ class Weapon():
                     self.projectile_queue.append(bullet)
                     
                     # remove bullet obj from inactive pool
-                    OnShotEffectInactivePools[bullet_object].inactive_pool.remove(bullet)
+                    engine.inactive_pool[bullet_object].remove(bullet)
 
                     # remove one from the display ammo because a bullet has been shot
                     self.bullets_remaining_in_mag -= 1
@@ -427,12 +411,46 @@ class Weapon():
                 for blt in to_remove:
 
                     # remove from queue and add to acitve pool
-                    OnShotEffectMgr.active_pool.append(blt)
+                    engine.active_pool.append(blt)
                     self.projectile_queue.remove(blt)
 
             # if empty start burst countdown to prevent shooting
             if not self.projectile_queue:
                 self.burst_countdown_active = True
+
+    def shoot(self):
+
+        # if there is a projectile in the queue
+        if self.projectile_queue:
+
+            to_remove = []
+
+            # go through each bullet in the projectile queue
+            for bullet in self.projectile_queue:
+
+
+                # if bullet.adjust_final_target:
+
+                #     bullet.target_position = self.wielded_by.shooting_target
+
+                if bullet.ready_to_be_shot():
+
+                    to_remove.append(bullet)
+
+            # remove bullets ready to be shot
+            if to_remove:
+
+                for blt in to_remove:
+
+                    # remove from queue and add to acitve pool
+                    engine.active_pool.append(blt)
+                    self.projectile_queue.remove(blt)
+
+            # if empty start burst countdown to prevent shooting
+            if not self.projectile_queue:
+                self.burst_countdown_active = True
+
+        pass
 
 
 class Bullet(Moveable_Object):
@@ -441,6 +459,9 @@ class Bullet(Moveable_Object):
         
         # time until bullet become active and is removed from projectile queue
         self.time_until_active_timer = Timer(timer_limit=0)
+
+        # timer for 
+        self.travelTimeTimer = Timer()
 
         # pathing var
         self.pathing = pathing
@@ -456,7 +477,14 @@ class Bullet(Moveable_Object):
         # projectile manager which helps init the bullet
         self.projectile_manager = None
 
-        Moveable_Object.__init__(self)
+        super().__init__(self)
+
+
+    def init(self):
+
+        self.travelTimeTimer.timer_init()
+
+        super().init()
 
 
     # function that controls when a bulelt is fromed, and the countdown before it becomes active
@@ -498,14 +526,14 @@ class Bullet(Moveable_Object):
     def travel_time(self):
 
         # run timer
-        self.run_timer()
+        self.travelTimeTimer.run_timer()
 
         # if life span is set to 0 then make the bullet never get deactivated over time
-        if self.timer_limit == -1:
+        if self.travelTimeTimer.timer_limit == -1:
             return
 
         # if its been travelling for a given time
-        elif self.timer_complete:
+        elif self.travelTimeTimer.timer_complete:
 
             # if the timer is over then just explode it
             # self.explode()
@@ -545,6 +573,7 @@ class Bullet(Moveable_Object):
                 if game_object.__class__.__name__ == "Enemy":
 
                     self.apply_damage(gameobj=game_object,damage=damage)
+                    
 
             if game_object.object_of_origin == 'Game':
 
@@ -569,61 +598,48 @@ class Bullet(Moveable_Object):
         # if not piercing
         self.is_active = False
 
-   
+    # apply damage function, handles death too
+    def apply_damage(self,gameobj:Moveable_Object,damage:float):
 
-    # # def check for a collision
-    # def collision_check(self):
+        gameobj.health -= damage
+        gameobj.health = max(0,gameobj.health)
 
-    #     # find surrounding objects
-    #     self.find_surrounding_game_objects()      
+        if gameobj.health <= 0:
+            self.projectile_manager.wielded_by.money += self.moneyOnKill
 
-    #     # BULLETS COLLIDING WITH GAME OBJECTS
-    #     if self.__class__.__name__ in ['Bullet','Bomb','Orbital','Card']:
+        elif gameobj.health > 0:
+            self.projectile_manager.wielded_by.money += self.moneyOnHit
 
-    #         # go through all possible game objects
-    #         for game_object in self.surrounding_game_objects:
 
-    #             # if game object is not a part of allowed collisions
-    #             if 'Bullet' not in game_object.allowed_collisions:
-    #                 continue
-
-    #             # rect collision check
-    #             if self.hurtbox.colliderect(game_object.hurtbox):
-
-    #                 # sprite collision check
-    #                 # if self.mask.overlap(game_object.mask,(game_object.hurtbox.left-self.hurtbox.left,game_object.hurtbox.top-self.hurtbox.top)):
-                    
-    #                 # handle collision
-    #                 self.handle_collision(game_object=game_object)
-
-    #                 # do damage
-    #                 self.is_active = False
+        # init damage number
+        if engine.display_dmg_num == 1:
+            dmgnum = engine.inactive_pool['DamageNumber'][0]
+            dmgnum.init(f"{damage}")
+            dmgnum.spawn(gameobj.hurtbox.center)
+            dmgnum.update_movement_vectors(unique_id='movement',direction_vectorX=0,
+                                            direction_vectorY=-1,acceleration=self.acceleration,Xcceleration_rate=0,
+                                            Xcceleration_rate_change='negative',
+                                            max_value=self.acceleration,reduce_on_wall_collision=False,reset_on_max_value=False)
+            engine.inactive_pool['DamageNumber'].remove(dmgnum)
+            engine.active_pool.append(dmgnum)
 
 
 
     # combines movement and collision function
-    def run_behaviour(self):
+    def update(self):
 
         # only show the orbital and draw it if it is active
         if self.is_active:
 
-            # track current tile
+            # update position
             self.update_position()
 
-            # find game objects
-            # self.find_game_objects_in_area()
 
-            # handle collisions with the wall and entities
-            # self.enemy_collision_rects()
+            # update movement vars
+            self.update_movement()
 
-            # # movement
-            self.move2()
-
-            # run on collisioin effects
-            # self.run_on_collision_effects()
-
-            # apply status effects
-            # self.apply_status_effects()
+            # movement
+            self.move_and_collide()
 
             # handle how long bullet is allowed to travel for
             self.travel_time()
@@ -631,36 +647,5 @@ class Bullet(Moveable_Object):
             # draw surface
             self.draw_surface(position=self.hurtbox.center)
 
-
-# This will be for storing inactive pools of all bullet-like objects
-OnShotEffectInactivePools = {}
-
-# controls all type of shooting objects
-class OnShotEffectManager():
-    def __init__(self):
-
-        self.active_pool = []
-
-    def run_behaviour(self):
-
-        if self.active_pool:
-
-            to_remove = []
-
-            for gameobj in self.active_pool:
-
-                gameobj.run_behaviour()
-
-                if not gameobj.is_active:
-                    to_remove.append(gameobj)
-
-            if to_remove:
-
-                for gameobj in to_remove:
-
-                    gameobj.kill(self.active_pool,OnShotEffectInactivePools[gameobj.__class__.__name__].inactive_pool)
-                
-
-
-OnShotEffectMgr = OnShotEffectManager()
+            self.draw_rect(position=self.hurtbox.center)
 

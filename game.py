@@ -2,12 +2,44 @@ import pygame,random,os,string,numpy,math
 from pygame.math import Vector2
 from window import Window
 from camera import Camera
+from statemachine import StateMachine
+from States.Game.splash import Splash
+from States.Game.paused import Paused
+# from States.Game import gameover
+from States.Game.gameplay import Gameplay
+from States.Game.quit import Quit
+from eventsystem import eventprocessor
 import sys
 pygame.font.init()
 
-class Game():
+
+class GameStateMachine(StateMachine):
 
     def __init__(self):
+
+        StateMachine.__init__(self)
+
+    def update(self):
+
+        # get all events
+        eventprocessor.events = pygame.event.get()
+
+        # handle events
+        eventprocessor.process_base_events()
+
+
+        self.state.update()
+
+        if self.state.done:
+            self.transition_to_next_state()
+
+class Game(GameStateMachine):
+
+    def __init__(self):
+
+        # vars for running the game
+        self.playing = True
+        self.clock = None
        
         self.FPS = 60
         self.delta = 1/self.FPS
@@ -29,11 +61,27 @@ class Game():
         # get extra event processing
         self.extra_event_processing = []
 
+        # get active pools
+        self.active_pool = []
+        self.inactive_pool = {}
+
         # set player
         self.player = None
 
         # create hud
         self.hud = None
+
+        # init state machine
+        self.states = {'SPLASH':Splash(),
+                       'GAMEPLAY':Gameplay(),
+                       'PAUSED':Paused(),
+                       'QUIT':Quit()}
+        
+        # set parent node for player states
+        for x in self.states:
+            self.states[x].parent_node = self
+        
+        self.state = self.states['SPLASH']
 
         # for creating dmg numbers
         self.display_dmg_num = -1
@@ -46,43 +94,43 @@ class Game():
         self.tile_size = 32
         self.tiles = {}
         self.accessible_tiles = []
-        view_rect = self.windows.win.get_rect(center = (0,0))
+#         view_rect = self.windows.win.get_rect(center = (0,0))
 
-        for x in range(view_rect.left,view_rect.right,32):
-            for y in range(view_rect.top,view_rect.bottom,32):
+#         for x in range(view_rect.left,view_rect.right,32):
+#             for y in range(view_rect.top,view_rect.bottom,32):
 
-                pos = (x,y)
+#                 pos = (x,y)
 
-                if pos in [(32,32)]:
-                    continue
-                self.accessible_tiles.append(pos)
+#                 if pos in [(32,32)]:
+#                     continue
+#                 self.accessible_tiles.append(pos)
 
                 
-        self.inaccessible_tiles = [(32,32),
-            # Top row (y = -320)
-            (-544, -320), (-512, -320), (-480, -320), (-448, -320), (-416, -320), (-384, -320), (-352, -320), (-320, -320),
-            (-288, -320), (-256, -320), (-224, -320), (-192, -320), (-160, -320), (-128, -320), (-96, -320), (-64, -320),
-            (-32, -320), (0, -320), (32, -320), (64, -320), (96, -320), (128, -320), (160, -320), (192, -320),
-            (224, -320), (256, -320), (288, -320), (320, -320), (352, -320), (384, -320), (416, -320), (448, -320),
-            (480, -320), (512, -320),
+#         self.inaccessible_tiles = [(32,32),
+#             # Top row (y = -320)
+#             (-544, -320), (-512, -320), (-480, -320), (-448, -320), (-416, -320), (-384, -320), (-352, -320), (-320, -320),
+#             (-288, -320), (-256, -320), (-224, -320), (-192, -320), (-160, -320), (-128, -320), (-96, -320), (-64, -320),
+#             (-32, -320), (0, -320), (32, -320), (64, -320), (96, -320), (128, -320), (160, -320), (192, -320),
+#             (224, -320), (256, -320), (288, -320), (320, -320), (352, -320), (384, -320), (416, -320), (448, -320),
+#             (480, -320), (512, -320),
 
-            # Bottom row (y = 288)
-            (-544, 288), (-512, 288), (-480, 288), (-448, 288), (-416, 288), (-384, 288), (-352, 288), (-320, 288),
-            (-288, 288), (-256, 288), (-224, 288), (-192, 288), (-160, 288), (-128, 288), (-96, 288), (-64, 288),
-            (-32, 288), (0, 288), (32, 288), (64, 288), (96, 288), (128, 288), (160, 288), (192, 288),
-            (224, 288), (256, 288), (288, 288), (320, 288), (352, 288), (384, 288), (416, 288), (448, 288),
-            (480, 288), (512, 288),
+#             # Bottom row (y = 288)
+#             (-544, 288), (-512, 288), (-480, 288), (-448, 288), (-416, 288), (-384, 288), (-352, 288), (-320, 288),
+#             (-288, 288), (-256, 288), (-224, 288), (-192, 288), (-160, 288), (-128, 288), (-96, 288), (-64, 288),
+#             (-32, 288), (0, 288), (32, 288), (64, 288), (96, 288), (128, 288), (160, 288), (192, 288),
+#             (224, 288), (256, 288), (288, 288), (320, 288), (352, 288), (384, 288), (416, 288), (448, 288),
+#             (480, 288), (512, 288),
 
-            # Left column (x = -544, excluding corners)
-            (-544, -288), (-544, -256), (-544, -224), (-544, -192), (-544, -160), (-544, -128), (-544, -96), (-544, -64),
-            (-544, -32), (-544, 0), (-544, 32), (-544, 64), (-544, 96), (-544, 128), (-544, 160), (-544, 192),
-            (-544, 224), (-544, 256),
+#             # Left column (x = -544, excluding corners)
+#             (-544, -288), (-544, -256), (-544, -224), (-544, -192), (-544, -160), (-544, -128), (-544, -96), (-544, -64),
+#             (-544, -32), (-544, 0), (-544, 32), (-544, 64), (-544, 96), (-544, 128), (-544, 160), (-544, 192),
+#             (-544, 224), (-544, 256),
 
-            # Right column (x = 512, excluding corners)
-            (512, -288), (512, -256), (512, -224), (512, -192), (512, -160), (512, -128), (512, -96), (512, -64),
-            (512, -32), (512, 0), (512, 32), (512, 64), (512, 96), (512, 128), (512, 160), (512, 192),
-            (512, 224), (512, 256)
-]
+#             # Right column (x = 512, excluding corners)
+#             (512, -288), (512, -256), (512, -224), (512, -192), (512, -160), (512, -128), (512, -96), (512, -64),
+#             (512, -32), (512, 0), (512, 32), (512, 64), (512, 96), (512, 128), (512, 160), (512, 192),
+#             (512, 224), (512, 256)
+# ]
 
         
         
@@ -99,35 +147,24 @@ class Game():
         # pen 
         self.pen = pygame.sysfont.SysFont("Arial",10)
         self.damage_number_pen = pygame.sysfont.SysFont("Arial",24)
-
-    # init/set values for certain attributes
-    def init(self,player:object,spawn_point:tuple=(0,0)):
-
-        self.player = player
-        self.player.spawn(spawn_point)
-        self.player.update_movement_vectors(unique_id='movement',direction_vectorX=0,direction_vectorY=0,acceleration=5,
-                                            Xcceleration_rate=0,Xcceleration_rate_change='negative',max_value=0,
-                                            reduce_on_wall_collision=False,reset_on_max_value=False)
         
-    # update mouse pos of player because it i srescaled
+    # run update function for all game objects
+    def update_game_objects(self):
 
-    # handle base events
-    def process_base_events(self):
+        if self.active_pool:
 
-        # loop through events
-        for event in self.events:
+            to_remove = []
 
-            # if the actual X is clicked to close the tab
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit(0)
+            for gameobj in self.active_pool:
+                gameobj.update()
+                if not gameobj.is_active:
+                    to_remove.append(gameobj)
 
-            for processor in self.extra_event_processing:
+            if to_remove:
+                for gameobj in to_remove:
 
-                processor(event)
+                    gameobj.kill(self.active_pool,self.inactive_pool[gameobj.__class__.__name__])
 
-        # empty extra event processing
-        self.extra_event_processing = []
     
     # update positions of all objects in the game
     def update_object_positions(self,coors:tuple,object_to_add:object):
@@ -171,8 +208,8 @@ class Game():
         # get all different surfaces that could be drawn on, always put winas the last
         surfs = list(set([drawinstruc['surface_to_draw_on'] for objid,drawinstruc in self.drawing_queue.items()]))
 
-        surfs.remove(engine.windows.win)
-        surfs.append(engine.windows.win)
+        surfs.remove(self.windows.win)
+        surfs.append(self.windows.win)
 
         # go through each surface
         for surf in surfs:
@@ -192,13 +229,22 @@ class Game():
                 # if what we are drawing is going to be a surface
                 if ZlayerSortedDrawingQueue[unique_id]['asset_type'] == 'surface':
 
-                    adjusted_position = (ZlayerSortedDrawingQueue[unique_id]['position_rect'].x + self.camera.bg_offset_x, ZlayerSortedDrawingQueue[unique_id]['position_rect'].y + self.camera.bg_offset_y)
+                    adjusted_position = (0,0)
+
+                    if not ZlayerSortedDrawingQueue[unique_id]['ignore_offset']:
+                        adjusted_position = (ZlayerSortedDrawingQueue[unique_id]['position_rect'].x + self.camera.bg_offset_x, ZlayerSortedDrawingQueue[unique_id]['position_rect'].y + self.camera.bg_offset_y)
+
+                    elif ZlayerSortedDrawingQueue[unique_id]['ignore_offset']:
+                        adjusted_position = (ZlayerSortedDrawingQueue[unique_id]['position_rect'].x + self.windows.win.get_width()//2, ZlayerSortedDrawingQueue[unique_id]['position_rect'].y + self.windows.win.get_height()//2)
+
+
 
                     if ZlayerSortedDrawingQueue[unique_id]['alpha'] != -1:
                     
                         ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].set_alpha(ZlayerSortedDrawingQueue[unique_id]['alpha'])
 
 
+                    # adjusted_position = (int(adjusted_position[0]),int(adjusted_position[1]))
                     ZlayerSortedDrawingQueue[unique_id]['surface_to_draw_on'].blit(ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'],adjusted_position)
 
 
@@ -241,7 +287,14 @@ class Game():
                 # if what we are drawing is going to be a surface
                 elif ZlayerSortedDrawingQueue[unique_id]['asset_type'] == 'polygon':
 
-                    adjusted_endpoints = [(e[0]+ engine.camera.bg_offset_x,e[1]+ engine.camera.bg_offset_y) for e in ZlayerSortedDrawingQueue[unique_id]['endpoints']]
+                    adjusted_endpoints = []
+
+                    if not ZlayerSortedDrawingQueue[unique_id]['ignore_offset']:
+                        adjusted_endpoints = [(e[0]+ self.camera.bg_offset_x,e[1]+ self.camera.bg_offset_y) for e in ZlayerSortedDrawingQueue[unique_id]['endpoints']]
+
+                    elif ZlayerSortedDrawingQueue[unique_id]['ignore_offset']:
+                        adjusted_endpoints = [(e[0]+ self.windows.win.get_width()//2,e[1]+ + self.windows.win.get_height()//2) for e in ZlayerSortedDrawingQueue[unique_id]['endpoints']]
+
 
                     pygame.draw.polygon(ZlayerSortedDrawingQueue[unique_id]['surface_to_draw_on'],(255,255,255),adjusted_endpoints)
 
@@ -268,7 +321,7 @@ class Game():
                     rect = pygame.FRect(*pos,32,32)
 
 
-                    engine.drawing_queue[f"{id(rect)}_rect"] = {'game_object':None,
+                    self.drawing_queue[f"{id(rect)}_rect"] = {'game_object':None,
                                                         'asset_to_draw':rect,
                                                         'asset_type':'rect',
                                                         'z_layer':2,
@@ -297,7 +350,7 @@ class Game():
 
                     txt_rect = txt.get_frect(center=(pos[0]+(tile_size//2),pos[1]+(tile_size//2)))
             
-                    engine.drawing_queue[f"{id(txt_rect)}_rect"] = {'game_object':None,
+                    self.drawing_queue[f"{id(txt_rect)}_rect"] = {'game_object':None,
                                                         'asset_to_draw':txt,
                                                         'asset_type':'surface',
                                                         'z_layer':2,
@@ -319,6 +372,7 @@ class Game():
                                                         'alpha_value':255,
                                                         'rect_colour':'blue',
                                                         'schedule_deletion':True,
+                                                        'ignore_offset':False,
                                                         'alpha':255}
     
 
@@ -366,7 +420,7 @@ class Game():
             pos = (rr.x,rr.y)
 
 
-            engine.drawing_queue[f"{id(rect)}_rect"] = {'game_object':None,
+            self.drawing_queue[f"{id(rect)}_rect"] = {'game_object':None,
                                                 'asset_to_draw':rect,
                                                 'asset_type':'rect',
                                                 'z_layer':2,
@@ -390,7 +444,7 @@ class Game():
                                                 'schedule_deletion':True}
             
 
-
+    
     def visualise_sine_wave3(self):
 
         
@@ -444,16 +498,16 @@ class Game():
             
             # if only xvel or yvel is changed then set the other axis movement to be 0 because we want to move left, then check for a collision, and then move right and do the same
             if direction_vectorX !=0:
-                movementx = (Vector2(direction_vectorX,0).normalize()*engine.delta*speed*acceleration)
+                movementx = (Vector2(direction_vectorX,0).normalize()*self.delta*speed*acceleration)
 
             if direction_vectorY !=0:
-                movementy = (Vector2(0,direction_vectorY).normalize()*engine.delta*speed*acceleration)
+                movementy = (Vector2(0,direction_vectorY).normalize()*self.delta*speed*acceleration)
 
             # if both x and y are pressed, normalise the x and y values the player is going to move in.
             # when both x and y are pressed, the normalised value is different from if only one of those was pressed
             if direction_vectorX != 0 and direction_vectorY != 0:
 
-                move = Vector2(direction_vectorX,direction_vectorY).normalize()*engine.delta*speed*acceleration
+                move = Vector2(direction_vectorX,direction_vectorY).normalize()*self.delta*speed*acceleration
 
                 # separate into only x movement and only y movement
                 movementx = (move[0],0)
@@ -473,16 +527,16 @@ class Game():
             
             # if only xvel or yvel is changed then set the other axis movement to be 0 because we want to move left, then check for a collision, and then move right and do the same
             if direction_vectorX !=0:
-                movementx = (Vector2(direction_vectorX,0)*engine.delta*speed*acceleration)
+                movementx = (Vector2(direction_vectorX,0)*self.delta*speed*acceleration)
 
             if direction_vectorY !=0:
-                movementy = (Vector2(0,direction_vectorY)*engine.delta*speed*acceleration)
+                movementy = (Vector2(0,direction_vectorY)*self.delta*speed*acceleration)
 
             # if both x and y are pressed, normalise the x and y values the player is going to move in.
             # when both x and y are pressed, the normalised value is different from if only one of those was pressed
             if direction_vectorX != 0 and direction_vectorY != 0:
 
-                move = Vector2(direction_vectorX,direction_vectorY)*engine.delta*speed*acceleration
+                move = Vector2(direction_vectorX,direction_vectorY)*self.delta*speed*acceleration
 
                 # separate into only x movement and only y movement
                 movementx = (move[0],0)
@@ -502,7 +556,7 @@ class Game():
             pos = (rr.x,rr.y)
 
 
-            engine.drawing_queue[f"{id(rect)}_rect"] = {'game_object':None,
+            self.drawing_queue[f"{id(rect)}_rect"] = {'game_object':None,
                                                 'asset_to_draw':rect,
                                                 'asset_type':'rect',
                                                 'z_layer':2,
@@ -525,4 +579,5 @@ class Game():
                                                 'rect_colour':'blue',
                                                 'schedule_deletion':True}
             
+
 engine = Game()

@@ -4,8 +4,8 @@
         {"zlayer_drawing":1,
         "rect_colour":"red",
         "object_of_origin":"Game",
-        "rect_width":32,
-        "rect_height":32,
+        "hurtbox_width":32,
+        "hurtbox_height":32,
         "name":"Environment",
 
         "img_path":"Sprites/Walls/Generic/Wall.png",

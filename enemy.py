@@ -63,24 +63,7 @@ class Enemy(Moveable_Object,Pathfinding,EnemyStateMachine):
         self.shooting_target_position = (0,0)
 
     # reinit
-    def init(self,attributes:dict={},pos:tuple=(0,0)):
-
-        # spawn
-        self.spawn(pos)
-
-        for att,val in attributes.items():
-
-            setattr(self,att,val)
-        
-        # init sprite variables
-        self.init_sprite()
-
-        # update hurtbox size
-        self.hurtbox.width = self.hurtbox_width
-        self.hurtbox.height = self.hurtbox_height
-
-        # update raycast vars
-        self.movement_raycast.init(attributes=self.movement_raycast_init)
+    def init(self):
 
         # init state machine
         self.states = {'IDLE':Idle(),
@@ -93,7 +76,11 @@ class Enemy(Moveable_Object,Pathfinding,EnemyStateMachine):
         
         self.state = self.states['IDLE']
 
-        self.original_vars = {k:v for k,v in self.__dict__.items()}
+        super().init()
+
+
+
+    
 
     # handle collision once the check is confirmed
     def handle_collision(self,game_object:Moveable_Object,axis:str):
@@ -166,82 +153,5 @@ class Enemy(Moveable_Object,Pathfinding,EnemyStateMachine):
             self.draw_rect(position=self.hurtbox.center)
 
 
-# This will be for storing inactive pools of all bullet-like objects
-EnemyInactivePools = {}
+engine.inactive_pool["Enemy"] = [Enemy() for _ in range(50)]
 
-
-# This is a pool of card objects 
-class DefaultPool():
-
-    def __init__(self):
-
-        self.inactive_pool = [Enemy() for _ in range(50)]
-
-# add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
-EnemyInactivePools["Enemy"] = DefaultPool()
-
-
-# controls all type of shooting objects
-class EnemyManager():
-    def __init__(self):
-
-        self.active_pool = []
-
-    def run_behaviour(self):
-
-        if self.active_pool:
-
-            to_remove = []
-
-            for gameobj in self.active_pool:
-
-                # gameobj.run_behaviour()
-                gameobj.update()
-
-                if not gameobj.is_active:
-                    to_remove.append(gameobj)
-
-            if to_remove:
-
-                for gameobj in to_remove:
-
-                    gameobj.kill(self.active_pool,EnemyInactivePools[gameobj.__class__.__name__].inactive_pool)
-
-
-EnemyMgr = EnemyManager()
-
-
-
-
-
-# event processing for shooting
-def spawn_enemy_event(event:pygame.Event):
-
-    # handling mouse clicks
-    if event.type == pygame.KEYDOWN:
-
-        if event.key == pygame.K_z:
-
-            enemy_object = EnemyInactivePools['Enemy'].inactive_pool[0]
-
-            # spawns = [(-48,-48),(-220,-100),(100,220),(500,100)]
-            spawns = [(120,256)]
-            
-            enemy_object.init(attributes=enemy_parameters['Enemy'],pos=random.choice(spawns))
-
-            EnemyMgr.active_pool.append(enemy_object)
-            EnemyInactivePools['Enemy'].inactive_pool.remove(enemy_object)
-
-
-engine.extra_event_processing.append(spawn_enemy_event)
-
-
-enemy_object = EnemyInactivePools['Enemy'].inactive_pool[0]
-
-# spawns = [(-48,-48),(-220,-100),(100,220),(500,100)]
-spawns = [(120,256)]
-
-enemy_object.init(attributes=enemy_parameters['Enemy'],pos=random.choice(spawns))
-
-EnemyMgr.active_pool.append(enemy_object)
-EnemyInactivePools['Enemy'].inactive_pool.remove(enemy_object)

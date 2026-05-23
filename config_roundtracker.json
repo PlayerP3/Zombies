@@ -1,0 +1,75 @@
+{
+    "betweenRoundsTimeLimit":5,
+    "enemy_number_increase_per_round_addition":{
+        "regular":10
+    },
+
+    "enemy_number_increase_per_round_multiplier":{
+        "regular":1.5
+    },
+
+    "round_for_enemy_number_multiplier_switch":{
+        "regular":10
+    },
+
+    "spawn_time_reduction_per_round":{
+        "regular":8
+    },
+
+    "time_between_spawns":{
+        "regular":1
+    },
+
+    "entities_alllowed_on_map":{
+        "regular":0
+    },
+
+    "max_entities_alllowed_on_map":{
+        "regular":1000
+    },
+
+    "entities_alllowed_on_map_increase_per_round_addition":{
+        "regular":20
+    },
+
+    "entities_alllowed_on_map_increase_per_round_multiplier":{
+        "regular":1.5
+    },
+
+    "round_for_entities_alllowed_on_map_multiplier_switch":{
+        "regular":10
+    },
+
+    "specific_entities_limit_for_round":{
+        "regular":10
+    },
+
+    "enemy_speed":{
+        "regular":[60,75,65]
+    },
+
+    "enemy_speed_increase_per_round":{
+        "regular":2.5
+    },
+
+    "enemy_max_speed_reduction":{
+        "regular":5
+    },
+
+    "enemy_health":{
+        "regular":50
+    },
+
+    "enemy_health_increase_per_round_addition":{
+        "regular":100
+    },
+
+    "enemy_health_increase_per_round_multiplier":{
+        "regular":1.5
+    },
+
+    "round_for_enemy_health_multiplier_switch":{
+        "regular":10
+    }
+
+}

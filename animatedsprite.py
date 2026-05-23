@@ -2,15 +2,17 @@ import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
 from game import engine
-from utils import Timer,linear_lerp
+from utils import linear_lerp
+from globs import delta
+from timer import Timer
 
 GameSprites = {}
 TextSprites = {}
 
-class AnimatedSprite(Timer):
+class AnimatedSprite():
 
     def __init__(self,zlayer_drawing:int=0,rect_colour:str='red',object_of_origin:str='Game',rect_width:float=23,rect_height:float=36,
-                 hurtbox_width:float=23,hurtbox_height:float=36,sprite_offsetx:float=0,sprite_offsety:float=0,
+                 hurtbox_width:float=23,hurtbox_height:float=36,sprite_offsetx:float=0,sprite_offsety:float=0,text_colour:str='green',
 
                  name:str='AnimatedSprite',img_path:str='Sprites/Cards/Hearts/1.png',img_width:int=32,img_width_scale:int=1,img_height:int=32,img_height_scale:int=1,
                  animation_delay:int=1,animation_speed:float=1,alpha:int=255,
@@ -21,7 +23,6 @@ class AnimatedSprite(Timer):
                  sprite_movement_type:str='none',flip_range:list=[],vertice:str='center',is_text:bool=False):
 
        
-        Timer.__init__(self)
 
         # set name
         self.name = name
@@ -45,6 +46,8 @@ class AnimatedSprite(Timer):
 
         # this rect is used for movement and collision
         self.hurtbox = pygame.FRect(0,0,hurtbox_width,hurtbox_height)
+        self.hurtbox_width = hurtbox_width
+        self.hurtbox_height = hurtbox_height
 
         # hitbox is used for sprite drawing/otherstuff
         # self.hitbox = pygame.FRect(0,0,rect_width,rect_height)
@@ -52,10 +55,15 @@ class AnimatedSprite(Timer):
         # drawing vars
         self.zlayer_drawing = zlayer_drawing
         self.rect_colour = rect_colour
+        self.text_colour = text_colour
 
         # set activity
         self.is_active = False
         self.is_active_timer = Timer(timer_speed=0,timer_limit=0)
+
+        # get animationt imer
+        self.animation_timer = Timer()
+        self.alpha_timer = Timer()
 
         self.object_of_origin = object_of_origin
 
@@ -96,8 +104,8 @@ class AnimatedSprite(Timer):
     def load_sprite_sheet(self):
         
         # determine scaled img width and height
-        scaled_width = int(self.img_width*self.img_width_scale)
-        scaled_height = int(self.img_height*self.img_height_scale)
+        scaled_width = int(self.img_width*self.img_width_scale*engine.camera.zoom)
+        scaled_height = int(self.img_height*self.img_height_scale*engine.camera.zoom)
 
         sprite_collection = {}
 
@@ -116,32 +124,34 @@ class AnimatedSprite(Timer):
         # load image from memory if it is in json already
         if self.img_path in SpriteCache:
             if 'loaded_image' in SpriteCache[self.img_path]:
-                self.image =  SpriteCache[self.img_path]['loaded_image']
+                self.image = SpriteCache[self.img_path]['loaded_image']
+
+                if self.is_text:
+                    self.img_width = self.image.get_width()
+                    self.img_height = self.image.get_height()
 
         # load image and store it in json if it does not exist
         elif self.img_path not in SpriteCache:
             
-            SpriteCache[self.img_path] = {'loaded_image':pygame.image.load(self.img_path).convert_alpha()}
-            self.image = SpriteCache[self.img_path]['loaded_image']
+            if not self.is_text:
+                SpriteCache[self.img_path] = {'loaded_image':pygame.image.load(self.img_path).convert_alpha()}
+                self.image = SpriteCache[self.img_path]['loaded_image']
+
+            elif self.is_text:
+                self.create_text_image()
 
     # reinit the sprite and rect 
     def init_sprite(self,SpriteCache:dict=GameSprites):
-
-        # if dealing with text
-        if self.is_text:
-            self.create_text_sprite()
 
         # load image, but if it is in memory then just take that
         self.load_or_update_image()
            
         # determine scaled img width and height
-        scaled_width = int(self.img_width*self.img_width_scale)
-        scaled_height = int(self.img_height*self.img_height_scale)
+        scaled_width = int(self.img_width*self.img_width_scale*engine.camera.zoom)
+        scaled_height = int(self.img_height*self.img_height_scale*engine.camera.zoom)
 
         # get dimensions
         dimensions = f"({scaled_width},{scaled_height})"
-
-        
 
         # if the class is present but we dont have a sprite for the specific obj
         if self.img_path not in SpriteCache:
@@ -149,7 +159,7 @@ class AnimatedSprite(Timer):
             SpriteCache[self.img_path][dimensions][self.direction] =  self.load_sprite_sheet()
 
         # if the specific obj is there but we dont have a class for that specific rect yet
-        if dimensions not in SpriteCache[self.img_path]:
+        elif dimensions not in SpriteCache[self.img_path]:
             SpriteCache[self.img_path][dimensions] = {self.direction:{}}
             SpriteCache[self.img_path][dimensions][self.direction] =  self.load_sprite_sheet()
 
@@ -160,33 +170,53 @@ class AnimatedSprite(Timer):
             SpriteCache[self.img_path][dimensions][self.direction] = {}
             SpriteCache[self.img_path][dimensions][self.direction] = self.load_sprite_sheet()
 
-        self.sprite =  SpriteCache[self.img_path][dimensions][self.direction][0]
+        self.sprite = SpriteCache[self.img_path][dimensions][self.direction][0]
         self.mask = pygame.mask.from_surface(self.sprite)
         self.mask_img = self.mask.to_surface()
         self.clearance = max([(self.hurtbox.width//engine.tile_size),(self.hurtbox.height//engine.tile_size)])
 
-    # init text sprite
-    def init_text_sprite(self,text:str='1'):
+        
 
-        # is text true
-        self.is_text = True
+    # make damage number
+    def create_text_image(self,SpriteCache:dict=GameSprites):
 
-        self.img_path = text
-        # self.init_sprite()
-    
+        # load image from memory if it is in json already
+        # if self.img_path in SpriteCache:
+        #     if 'loaded_image' in SpriteCache[self.img_path]:
+        #         self.image =  SpriteCache[self.img_path]['loaded_image']
+
+        #         # set width and heigh to be that of the image
+        #         self.img_width = self.image.get_width()
+        #         self.img_height = self.image.get_height()
+
+
+        # load image and store it in json if it does not exist
+        # elif self.img_path not in SpriteCache:
+
+        surf = engine.damage_number_pen.render(f"{self.img_path}",True,self.text_colour)
+
+        GameSprites[self.img_path] = {'loaded_image':surf}
+
+        # set image
+        self.image = surf
+
+        # set width and heigh to be that of the image
+        self.img_width = self.image.get_width()
+        self.img_height = self.image.get_height()
+
     # update mask and rect based on current sprite
     def update_rect_and_mask(self,SpriteCache:dict=GameSprites):
 
         # determine scaled img width and height
-        scaled_width = int(self.img_width*self.img_width_scale)
-        scaled_height = int(self.img_height*self.img_height_scale)
+        scaled_width = int(self.img_width*self.img_width_scale*engine.camera.zoom)
+        scaled_height = int(self.img_height*self.img_height_scale*engine.camera.zoom)
 
         # get dimensions
         dimensions = f"({scaled_width},{scaled_height})"
 
         # if movement type is draw_sine meaning the sprite floats up and down in place
         if self.sprite_movement_type == 'sine':
-            self.draw_sine_wave_timer += (engine.delta*self.draw_sine_wave_speed)
+            self.draw_sine_wave_timer += (delta*self.draw_sine_wave_speed)
             self.rect.centery = self.anchor_pos[1] + math.sin(self.draw_sine_wave_timer)*self.draw_sine_wave_amplitude
 
             if self.draw_sine_wave_timer >= math.pi*2:
@@ -198,28 +228,31 @@ class AnimatedSprite(Timer):
         self.mask_img = self.mask.to_surface()
         self.clearance = max([(self.hurtbox.width//engine.tile_size)+1,(self.hurtbox.height//engine.tile_size)+1])
 
+        oldcent = self.hurtbox.center
+        self.hurtbox.width = self.hurtbox_width * engine.camera.zoom
+        self.hurtbox.height = self.hurtbox_height * engine.camera.zoom
+        self.hurtbox.center = oldcent
+
 
     
 
     def update_sprite(self,SpriteCache:dict=GameSprites):
 
         # dimensions of the sprite
-        dimensions = f"({int(self.img_width*self.img_width_scale)},{int(self.img_height*self.img_height_scale)})"
+        # dimensions = f"({int(self.img_width*self.img_width_scale)},{int(self.img_height*self.img_height_scale)})"
 
         # resize or rotate the sprite
         self.resize_and_rotate_sprite()
 
         # animation_frames = list(self.sprite_collection[self.direction].keys())
-        animation_frames = list(SpriteCache[self.img_path][dimensions][self.direction].keys())
+        animation_frames = list(SpriteCache[self.img_path][f"({int(self.img_width*self.img_width_scale*engine.camera.zoom)},{int(self.img_height*self.img_height_scale*engine.camera.zoom)})"][self.direction].keys())
 
         # sprite_index = (self.animation_count//self.animation_delay) % len(animation_frames)
 
         # # self.sprite = self.sprite_collection[self.direction][sprite_index]
         # self.sprite = SpriteCache[self.img_path][dimensions][self.direction][sprite_index]
 
-        # self.animation_count += (engine.delta*self.animation_speed)
-
-   
+        # self.animation_count += (delta*self.animation_speed)
 
         # map index to draw_sine wave timer
         if self.sprite_movement_type == 'sine':
@@ -237,8 +270,8 @@ class AnimatedSprite(Timer):
         self.load_or_update_image()
 
         # determine scaled img width and height
-        scaled_width = int(self.img_width*self.img_width_scale)
-        scaled_height = int(self.img_height*self.img_height_scale)
+        scaled_width = int(self.img_width*self.img_width_scale*engine.camera.zoom)
+        scaled_height = int(self.img_height*self.img_height_scale*engine.camera.zoom)
 
         
 
@@ -275,12 +308,12 @@ class AnimatedSprite(Timer):
 
     def draw_surface(self,asset_type:str='surface',surface_to_draw_on=engine.windows.win,game_object_origin:str='game',is_animated:bool=False,
                        animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,
-                       zlayer:int=1):
+                       zlayer:int=1,ignore_offset:bool=False):
 
         # update sprite
         self.update_sprite()
 
-        position = (position[0]+self.sprite_offsetx,position[1]+self.sprite_offsety)
+        position = (position[0]+(self.sprite_offsetx*engine.camera.zoom),position[1]+(self.sprite_offsety*engine.camera.zoom))
 
         pos_rect = None
 
@@ -293,15 +326,6 @@ class AnimatedSprite(Timer):
             pos_rect = self.sprite.get_frect(topleft=position)
 
         random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
-
-        # if self.__class__.__name__ == 'Card':
-
-            # print('htibox')
-            # print(self.hitbox)
-            # print('pos rect')
-            # print(pos_rect)
-        #     print('sprite rect')
-        #     print(self.sprite.get_frect())
 
 
         engine.drawing_queue[random_id] = {'game_object':'obj',
@@ -324,6 +348,7 @@ class AnimatedSprite(Timer):
                                         'initial_height':initial_height,
                                         'scale_factor_timer':1,
                                         'alpha':self.alpha,
+                                        'ignore_offset':ignore_offset,
                                         'schedule_deletion':True}
 
     def draw_hitbox(self,asset_type:str='rect',surface_to_draw_on:str=engine.windows.win,game_object_origin:str='game',
@@ -433,91 +458,24 @@ class AnimatedSprite(Timer):
                                         'alpha_value':255,
                                         'schedule_deletion':True}
         
-
-    # make damage number
-    def create_text_sprite(self,colour:str='green',SpriteCache:dict=GameSprites):
-
-        # load image from memory if it is in json already
-        if self.img_path in SpriteCache:
-            if 'loaded_image' in SpriteCache[self.img_path]:
-                self.image =  SpriteCache[self.img_path]['loaded_image']
-
-                # set width and heigh to be that of the image
-                self.img_width = self.image.get_width()
-                self.img_height = self.image.get_height()
-
-
-        # load image and store it in json if it does not exist
-        elif self.img_path not in SpriteCache:
-    
-            surf = engine.damage_number_pen.render(f"{self.img_path}",True,colour)
-
-            GameSprites[self.img_path] = {'loaded_image':surf}
-
-            # set image
-            self.image = surf
-
-            # set width and heigh to be that of the image
-            self.img_width = self.image.get_width()
-            self.img_height = self.image.get_height()
-
         
     def reduce_alpha(self):
 
         # run timer for x seconds
-        self.run_timer()
+        self.alpha_timer.run_timer()
 
         # find alpha
         self.alpha = linear_lerp(start=255,end=0,t=self.elapsed_time_fraction)
 
         # if active timer completed then set to inactive
-        if self.timer_complete:
+        if self.alpha_timer.timer_complete:
             self.is_active = False
 
+    def flicker_alpha(self):
 
+        self.alpha_timer.run_timer()
 
-    # make damage number
-    # def create_dmg_number_surface(num:int):
-
-    #     # turn into string and break number
-    #     strnums = list(str(num))
-
-    #     # get full width and height for new surface
-    #     newwidth = 10
-    #     newheight = 3
-
-    #     for num in strnums:
-
-    #         dimensions = list(GameSprites[f"Sprites/Miscellaneous/Numbers/{num}.png"])[0]
-    #         sprite = GameSprites[f"Sprites/Miscellaneous/Numbers/{num}.png"][dimensions][0][0]
-        
-    #         newwidth += sprite.get_width()
-    #         newheight += sprite.get_height()
-
-    #     # create surface
-    #     surf = pygame.Surface((newwidth,newheight),pygame.SRCALPHA,32)
-
-    #     single_width = newwidth//strnums
-
-    #     # go through numbers again and start adding them to surface
-    #     for i in range(strnums):
-
-    #         pos = (single_width*i,0)
-
-    #         # get sprite
-    #         sprite = GameSprites[f"Sprites/Miscellaneous/Numbers/{strnums[i]}.png"][dimensions][0][0]
-
-    #         # blit on surface
-    #         surf.blit(sprite,pos)
-            
-    #     # add surf to game sprites
-    #     GameSprites[f"Sprites/Miscellaneous/Numbers/{num}.png"][f"({newwidth},{newheight})"][0][0]
-
-
-
-
-
-
+        self.alpha = 255 * self.alpha_timer.map_to_sine_wave()
 
 # get numbers
 # load files in

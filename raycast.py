@@ -188,19 +188,19 @@ class Raycast():
 
             # so because we are blitting the window onto the fog surface, it also follows the color key rules where anything white is shown
             # draw triangles and fill with white so we can see everything not in the fog
-            self.draw_polygon(endpoints=fow_endpoints)
+            self.draw_polygon(endpoints=fow_endpoints,ignore_offset=False)
 
         engine.windows.fog_of_war_surface.fill((0,0,0))
         
         # draw wincopy onto fog surface
-        self.draw_fog_onto_copy()
+        self.draw_fog_onto_copy(ignore_offset=True)
 
         # draw fog of war surface
-        self.draw_surface()
+        self.draw_surface(ignore_offset=True)
 
     def draw_fog_onto_copy(self,asset_type:str='surface',surface_to_draw_on=engine.windows.fog_of_war_surface,game_object_origin:str='game',is_animated:bool=False,
                        animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,
-                       zlayer:int=0,alpha:int=100):
+                       zlayer:int=0,alpha:int=100,ignore_offset:bool=False):
 
         pos_rect = engine.windows.win.get_frect(center=position)
 
@@ -226,12 +226,13 @@ class Raycast():
                                         'initial_height':initial_height,
                                         'scale_factor_timer':1,
                                         'alpha':alpha,
+                                        'ignore_offset':ignore_offset,
                                         'schedule_deletion':True}
         
     # adjust alpha on fog of war surface to determien if we see objects like transparency wise
     def draw_surface(self,asset_type:str='surface',surface_to_draw_on=engine.windows.win,game_object_origin:str='game',is_animated:bool=False,
                        animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,
-                       zlayer:int=2,alpha:int=100):
+                       zlayer:int=2,alpha:int=100,ignore_offset:bool=False):
 
         pos_rect = engine.windows.win.get_frect(center=position)
 
@@ -257,11 +258,12 @@ class Raycast():
                                         'initial_height':initial_height,
                                         'scale_factor_timer':1, 
                                         'alpha':alpha,
+                                        'ignore_offset':ignore_offset,
                                         'schedule_deletion':True}
         
     def draw_polygon(self,asset_type:str='polygon',surface_to_draw_on=engine.windows.fog_of_war_surface,game_object_origin:str='game',is_animated:bool=False,
                     animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,endpoints:list=[],
-                    zlayer:int=1,alpha:int=255):
+                    zlayer:int=1,alpha:int=255,ignore_offset:bool=False):
 
         pos_rect = engine.windows.win.get_frect(center=position)
 
@@ -288,6 +290,7 @@ class Raycast():
                                         'scale_factor_timer':1,
                                         'alpha':alpha,
                                         'endpoints':endpoints,
+                                        'ignore_offset':ignore_offset,
                                         'schedule_deletion':True}
 
     def draw_lines(self,asset_to_draw=None,asset_type:str='line',surface_to_draw_on:str=engine.windows.win,game_object_origin:str='Map',is_animated:bool=False,

@@ -9,18 +9,42 @@ import string
 import copy
 import numpy as np
 from moveableobject import Moveable_Object
+from interactable import Interactable,Idle,Interacting
 # from miscsprites import MiscellaneousMgr
 
-class Item(Moveable_Object):
+# load in parameters
+with open('config_item.json','r') as item_attributes_file:
+
+    item_parameters = json.load(item_attributes_file)
+
+class Item(Interactable):
 
     def __init__(self):
 
         self.display_item = Moveable_Object()
+        self.display_item_init = {}
 
-        
-        Moveable_Object.__init__(self)
+        Interactable.__init__(self)
      
 
+    def init(self):
+
+        # display item init
+        # can use the below because we have set attr already
+        for att,val in self.display_item_init.items():
+            setattr(self.display_item,att,val)
+
+        self.display_item.init_sprite()
+        self.display_item.hurtbox.center = self.hurtbox.center
+
+        super().init()
+
+       
+
+    # stick display item to pedesatal
+    def stick_item_to_pedestal(self):
+
+        self.display_item.hurtbox.center = self.hurtbox.center
 
     # what happens when a player picks up the item
     def pickup(self):
@@ -28,16 +52,35 @@ class Item(Moveable_Object):
         pass
 
     # what happens when pickup is done like changing stats etc
-    def give(self):
+    def pay(self,gameobj):
 
-        engine.player.picked_items.append(self.name)
+        if self.name in gameobj.picked_items:
+            return
+        
+        gameobj.picked_items.append(item_parameters[self.name])
 
-        pass
+        if item_parameters[self.name]["effect"] == "stat change":
+            
+            set_attributes(game_object=gameobj,attributes=item_parameters[self.name]["stat_val"])
+     
 
-# different types of items on pickup
-# exmaple
-# item that gives familiar, on pickup run create_familiar function
-# item that gives you access to DOT attacks, run add_status_effect_to_cards functino
-# item that gives allows your DOT effects to evolve after reaching a certain number, turns on can_evolve signal, so when a bullet hits, triggers a status effect application, and in that
-# application function we might chose an evolution, evolvced state always does twice the damage of the base
-# each frame status effects look thropugh the immunity list for the entity it is attached to and it will notdo damage if the immunity si on 
+
+
+# add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
+engine.inactive_pool["Item"] = [Item() for _ in range(300)]
+
+miscobj = engine.inactive_pool['Item'][0]
+
+# spawns = [(-48,-48),(-220,-100),(100,220),(500,100)]
+spawns = [(-224,100)]
+
+set_attributes(game_object=miscobj,attributes=item_parameters['HealthUp'])
+miscobj.init()
+store_original_vars(game_object=miscobj)
+
+miscobj.spawn(random.choice(spawns))
+
+engine.active_pool.append(miscobj)
+engine.inactive_pool['Item'].remove(miscobj)
+
+
