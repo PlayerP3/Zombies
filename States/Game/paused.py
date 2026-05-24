@@ -32,21 +32,24 @@ class Paused(State):
 
     def update(self):
 
+        self.option_select = None
+
+         # self.parent_node.screenManager.windows['win']focus = self.parent_node.objectManager.player.hurtbox.center
+        self.parent_node.screenManager.windows['win'].focus = (0,0)
+
+        self.parent_node.screenManager.windows['win'].track_position()
+
         # get mouse pos
         mouse_pos = pygame.mouse.get_pos()
 
-        x = mouse_pos[0]/(self.parent_node.screenManager.fullscreen_width/self.parent_node.screenManager.windows['win'].win_width) - self.parent_node.screenManager.windows['win'].bg_offset_x
-        y = mouse_pos[1]/(self.parent_node.screenManager.fullscreen_height/self.parent_node.screenManager.windows['win'].win_height) - self.parent_node.screenManager.windows['win'].bg_offset_y
-
+        x = (mouse_pos[0]/(self.parent_node.screenManager.fullscreen_width/self.parent_node.screenManager.windows['win'].win_width) - self.parent_node.screenManager.windows['win'].bg_offset_x)/ self.parent_node.screenManager.windows['win'].zoom
+        y = (mouse_pos[1]/(self.parent_node.screenManager.fullscreen_height/self.parent_node.screenManager.windows['win'].win_height) - self.parent_node.screenManager.windows['win'].bg_offset_y)/ self.parent_node.screenManager.windows['win'].zoom
+        
         # submit event processing
         self.submit_event_processing()
 
         # fill window
         self.parent_node.screenManager.windows['win'].win.fill((0,0,0))
-
-        # subsample circle
-        self.parent_node.screenManager.windows['win'].focus = (0,0)
-        self.parent_node.screenManager.windows['win'].track_object_spring()
 
         # display hud
         self.parent_node.overlay.display_hud()

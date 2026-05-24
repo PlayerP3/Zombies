@@ -43,8 +43,9 @@ class Gameplay(State):
         self.parent_node.screenManager.windows['fog_of_war'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
         self.parent_node.screenManager.windows['wincopy'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
         self.parent_node.screenManager.windows['wincopy'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
-        # self.parent_node.screenManager.windows['fog_of_war'].focus = self.parent_node.objectManager.player.hurtbox.center
-        # self.parent_node.screenManager.windows['fog_of_war'].track_object_spring()
+
+        self.parent_node.screenManager.windows['playeroverlay'].win.fill((0,0,0,0))
+        
 
         # run game object behaviour
         self.parent_node.objectManager.update_game_objects()
@@ -56,6 +57,7 @@ class Gameplay(State):
 
         # draw all objects onto the window
         self.parent_node.screenManager.render_windows()
+        self.parent_node.screenManager.windows['win'].win.blit(self.parent_node.screenManager.windows['playeroverlay'].win,(0,0))
 
         # scale the window, and blit to display
         pygame.transform.scale(self.parent_node.screenManager.windows['win'].win,(self.parent_node.screenManager.fullscreen_width,self.parent_node.screenManager.fullscreen_height),self.parent_node.screenManager.screen)
