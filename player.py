@@ -172,8 +172,6 @@ class Player(Moveable_Object,PlayerStateMachine):
         self.shooting_target_position = (x,y)
         self.weapon.shooting_start_position = self.hurtbox.center
 
-        print(x,y)
-
     # swap weapon function
     def swap_weapon(self):
 

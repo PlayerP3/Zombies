@@ -125,16 +125,16 @@ class Wallbuy(Item):
 
 
 
-for wb in wallbuy_parameters:
+# for wb in wallbuy_parameters:
 
-    wbobj = Wallbuy()
+#     wbobj = Wallbuy()
 
-    set_attributes(game_object=wbobj,attributes=wallbuy_parameters[wb])
-    wbobj.init()
-    store_original_vars(game_object=wbobj)
+#     set_attributes(game_object=wbobj,attributes=wallbuy_parameters[wb])
+#     wbobj.init()
+#     store_original_vars(game_object=wbobj)
 
-    wbobj.spawn(pos=wallbuy_parameters[wb]['pos'])
+#     wbobj.spawn(pos=wallbuy_parameters[wb]['pos'])
 
-    objectManager.active_pool.append(wbobj)
+#     objectManager.active_pool.append(wbobj)
 
 

@@ -6,13 +6,18 @@ from States.Game.paused import Paused
 # from States.Game import gameover
 from States.Game.gameplay import Gameplay
 from States.Game.quit import Quit
-
-pygame.init()
+from wallbuy import Wallbuy
+from engine.animatedsprite import AnimatedSprite
+from bgtile import BgTile
+from door import Door
+from wall import Wall
 
 # init engine
 core = Pyn.Pynaccle()
 
-core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()})
+core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()},
+          tilemapJSON='chunk1.json',
+          classMappings={'Wallbuy':Wallbuy,'BgTile':BgTile,'Door':Door,'Wall':Wall})
 
 # add screens
 
@@ -23,6 +28,14 @@ core.screenManager.add_window('win',1280,720,(core.screenManager.fullscreen_widt
 core.screenManager.windows['win'].zoom = 1.5
 core.screenManager.windows['wincopy'].zoom = 1.5
 core.screenManager.windows['fog_of_war'].zoom = 1.5
+
+for bbj in core.objectManager.active_pool:
+    bbj.init()
+
+    if bbj.__class__.__name__ != 'BgTile':
+        bbj.spawnL()
+    
+    
 
 import cProfile
 import pstats

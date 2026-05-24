@@ -102,14 +102,14 @@ class Wall(Moveable_Object):
             # self.draw_hitbox(position=self.hitbox.center)
 
 
-walle = Wall()
+# walle = Wall()
 
-set_attributes(game_object=walle,attributes=wall_parameters['Generic'])
-walle.init()
-store_original_vars(game_object=walle)
+# set_attributes(game_object=walle,attributes=wall_parameters['Generic'])
+# walle.init()
+# store_original_vars(game_object=walle)
 
-walle.spawn((48,48))
+# walle.spawn((48,48))
 
-objectManager.active_pool.append(walle)
+# objectManager.active_pool.append(walle)
 
 

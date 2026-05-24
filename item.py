@@ -64,18 +64,18 @@ class Item(Interactable):
 # add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
 objectManager.inactive_pool["Item"] = [Item() for _ in range(300)]
 
-miscobj = objectManager.inactive_pool['Item'][0]
+# miscobj = objectManager.inactive_pool['Item'][0]
 
 # spawns = [(-48,-48),(-220,-100),(100,220),(500,100)]
 spawns = [(-224,100)]
 
-set_attributes(game_object=miscobj,attributes=item_parameters['HealthUp'])
-miscobj.init()
-store_original_vars(game_object=miscobj)
+# set_attributes(game_object=miscobj,attributes=item_parameters['HealthUp'])
+# miscobj.init()
+# store_original_vars(game_object=miscobj)
 
-miscobj.spawn(random.choice(spawns))
+# miscobj.spawn(random.choice(spawns))
 
-objectManager.active_pool.append(miscobj)
-objectManager.inactive_pool['Item'].remove(miscobj)
+# objectManager.active_pool.append(miscobj)
+# objectManager.inactive_pool['Item'].remove(miscobj)
 
 

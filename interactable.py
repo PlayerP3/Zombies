@@ -129,18 +129,18 @@ class Interactable(Moveable_Object,InteractableStateMachine):
 # add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
 objectManager.inactive_pool["Interactable"] = [Interactable() for _ in range(300)]
 
-miscobj = objectManager.inactive_pool['Interactable'][0]
+# miscobj = objectManager.inactive_pool['Interactable'][0]
 
-# spawns = [(-48,-48),(-220,-100),(100,220),(500,100)]
-spawns = [(0,0)]
+# # spawns = [(-48,-48),(-220,-100),(100,220),(500,100)]
+# spawns = [(0,0)]
 
-set_attributes(game_object=miscobj,attributes=interactable_parameters['Interactable'])
-miscobj.init()
-store_original_vars(game_object=miscobj)
+# set_attributes(game_object=miscobj,attributes=interactable_parameters['Interactable'])
+# miscobj.init()
+# store_original_vars(game_object=miscobj)
 
 
-miscobj.spawn(random.choice(spawns))
+# miscobj.spawn(random.choice(spawns))
 
-objectManager.active_pool.append(miscobj)
-objectManager.inactive_pool['Interactable'].remove(miscobj)
+# objectManager.active_pool.append(miscobj)
+# objectManager.inactive_pool['Interactable'].remove(miscobj)
 
