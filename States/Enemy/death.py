@@ -1,8 +1,8 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from game import engine
-from statemachine import State
+from engine.statemachine import State
+from engine.objectsystem import objectManager
 
 
 class Death(State):
@@ -22,10 +22,10 @@ class Death(State):
         self.timer_init()
 
         # remove self from game positions
-        if self.parent_node.current_tile_position in engine.object_positions:
+        if self.parent_node.current_tile_position in objectManager.object_positions:
 
-            if self.parent_node in engine.object_positions[self.parent_node.current_tile_position]:
-                engine.object_positions[self.parent_node.current_tile_position].remove(self.parent_node) 
+            if self.parent_node in objectManager.object_positions[self.parent_node.current_tile_position]:
+                objectManager.object_positions[self.parent_node.current_tile_position].remove(self.parent_node) 
 
 
     def update(self):
@@ -51,7 +51,7 @@ class Death(State):
         self.parent_node.is_active = False
 
         # remove self from game positions
-        if self.parent_node.current_tile_position in engine.object_positions:
+        if self.parent_node.current_tile_position in objectManager.object_positions:
 
-            if self.parent_node in engine.object_positions[self.parent_node.current_tile_position]:
-                engine.object_positions[self.parent_node.current_tile_position].remove(self.parent_node) 
+            if self.parent_node in objectManager.object_positions[self.parent_node.current_tile_position]:
+                objectManager.object_positions[self.parent_node.current_tile_position].remove(self.parent_node) 

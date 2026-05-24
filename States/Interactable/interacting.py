@@ -1,8 +1,8 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from game import engine
-from statemachine import State
+from engine.statemachine import State
+from engine.objectsystem import objectManager
 
 
 class Interacting(State):
@@ -38,11 +38,11 @@ class Interacting(State):
         
         if self.timer_complete:
 
-            self.parent_node.pay(gameobj=engine.player)
+            self.parent_node.pay(gameobj=objectManager.player)
 
             self.emit('IDLE')
 
-        elif not engine.player.is_interacting:
+        elif not objectManager.player.is_interacting:
             self.emit('IDLE')
 
 

@@ -1,9 +1,9 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from game import engine
-from statemachine import State
-
+from engine.statemachine import State
+from engine.objectsystem import objectManager
+from engine.tilemap import tilemapProcessor
 
 class Chasing(State):
 
@@ -21,7 +21,7 @@ class Chasing(State):
         # submit event processing
         self.submit_event_processing()
 
-        self.parent_node.pathing_end_position_target = engine.player.hurtbox.center
+        self.parent_node.pathing_end_position_target = objectManager.player.hurtbox.center
 
         # update pathing and cache
         self.parent_node.update_pathing_and_cache()
@@ -39,5 +39,5 @@ class Chasing(State):
         if self.parent_node.health <= 0:
             self.emit('DEATH')
 
-        elif engine.player.current_tile_position not in engine.accessible_tiles:
+        elif objectManager.player.current_tile_position not in tilemapProcessor.accessible_tiles:
             self.emit('IDLE')

@@ -1,8 +1,7 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from statemachine import State
-from eventsystem import eventprocessor
+from engine.statemachine import State
 
 pass
 
@@ -14,12 +13,18 @@ class Gameplay(State):
 
     def enter(self):
 
-        self.parent_node.hud.activate_hud_elements(['PlayerHealth','RoundNumber','Ammo','Points'])
-        self.parent_node.hud.deactivate_hud_elements(['Splash','Pause'])
+        self.parent_node.overlay.activate_hud_elements(['PlayerHealth','RoundNumber','Ammo','Points'])
+        self.parent_node.overlay.deactivate_hud_elements(['Splash','Pause'])
 
-        self.parent_node.camera.pos = self.parent_node.player.hurtbox.center
-        self.parent_node.camera.focus = self.parent_node.player.hurtbox.center
-        self.parent_node.camera.track_object_spring(window=self.parent_node.windows.win)
+        self.parent_node.screenManager.windows['win'].pos = self.parent_node.objectManager.player.hurtbox.center
+        self.parent_node.screenManager.windows['win'].focus = self.parent_node.objectManager.player.hurtbox.center
+        self.parent_node.screenManager.windows['win'].track_object_spring()
+
+        self.parent_node.screenManager.windows['fog_of_war'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
+        self.parent_node.screenManager.windows['fog_of_war'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
+        self.parent_node.screenManager.windows['wincopy'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
+        self.parent_node.screenManager.windows['wincopy'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
+        # self.parent_node.screenManager.windows['fog_of_war'].track_object_spring()
 
 
     def update(self):
@@ -27,27 +32,33 @@ class Gameplay(State):
         self.submit_event_processing()
 
         # fill window
-        self.parent_node.windows.win.fill((200,0,0))
+        self.parent_node.screenManager.windows['win'].win.fill((200,0,0))
 
-        self.parent_node.windows.win_copy = self.parent_node.windows.win.copy()
+        # self.parent_node.screenManager.windows['win'].win_copy = self.parent_node.screenManager.windows['win']
 
         # engine.camera.track_position(window=engine.windows.win)
-        self.parent_node.camera.focus = self.parent_node.player.hurtbox.center
-        self.parent_node.camera.track_object_spring(window=self.parent_node.windows.win)
+        self.parent_node.screenManager.windows['win'].focus = self.parent_node.objectManager.player.hurtbox.center
+        self.parent_node.screenManager.windows['win'].track_object_spring()
+        self.parent_node.screenManager.windows['fog_of_war'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
+        self.parent_node.screenManager.windows['fog_of_war'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
+        self.parent_node.screenManager.windows['wincopy'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
+        self.parent_node.screenManager.windows['wincopy'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
+        # self.parent_node.screenManager.windows['fog_of_war'].focus = self.parent_node.objectManager.player.hurtbox.center
+        # self.parent_node.screenManager.windows['fog_of_war'].track_object_spring()
 
         # run game object behaviour
-        self.parent_node.update_game_objects()
+        self.parent_node.objectManager.update_game_objects()
 
         # display hud
-        self.parent_node.hud.display_hud()
+        self.parent_node.overlay.display_hud()
 
         # self.parent_node.display_game_tiles()
 
         # draw all objects onto the window
-        self.parent_node.draw_objects()
+        self.parent_node.screenManager.render_windows()
 
         # scale the window, and blit to display
-        pygame.transform.scale(self.parent_node.windows.win,(self.parent_node.windows.fullscreen_width,self.parent_node.windows.fullscreen_height),self.parent_node.windows.screen)
+        pygame.transform.scale(self.parent_node.screenManager.windows['win'].win,(self.parent_node.screenManager.fullscreen_width,self.parent_node.screenManager.fullscreen_height),self.parent_node.screenManager.screen)
 
         # update display
         pygame.display.flip()

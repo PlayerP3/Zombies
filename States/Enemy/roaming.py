@@ -1,8 +1,8 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from game import engine
-from statemachine import State
+from engine.statemachine import State
+from engine.objectsystem import objectManager
 
 
 class Roaming(State):
@@ -31,7 +31,7 @@ class Roaming(State):
         # submit event processing
         self.submit_event_processing()
 
-        self.pathing_end_position_target = engine.player.hurtbox.center
+        self.pathing_end_position_target = objectManager.player.hurtbox.center
 
 
         # determine the pathing the entity is going to be using

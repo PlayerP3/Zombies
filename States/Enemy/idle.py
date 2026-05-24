@@ -1,9 +1,8 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from game import engine
-from statemachine import State
-
+from engine.statemachine import State
+from engine.objectsystem import objectManager
 
 class Idle(State):
 
@@ -31,7 +30,7 @@ class Idle(State):
         # submit event processing
         self.submit_event_processing()
 
-        self.parent_node.pathing_end_position_target = engine.player.hurtbox.center
+        self.parent_node.pathing_end_position_target = objectManager.player.hurtbox.center
 
         # # movement
         self.parent_node.move_and_collide()

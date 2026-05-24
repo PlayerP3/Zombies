@@ -1,8 +1,8 @@
 import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
-from game import engine
-from statemachine import State
+from engine.statemachine import State
+from engine.objectsystem import objectManager
 import sys
 
 class Shooting(State):
@@ -48,7 +48,7 @@ class Shooting(State):
                 for blt in to_remove:
 
                     # remove from queue and add to acitve pool
-                    engine.active_pool.append(blt)
+                    objectManager.active_pool.append(blt)
                     self.parent_node.projectile_queue.remove(blt)
 
             # if empty start burst countdown to prevent shooting

@@ -1,8 +1,7 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from game import engine
-from statemachine import State
+from engine.statemachine import State
 
 
 class Idle(State):
@@ -72,8 +71,8 @@ class Idle(State):
             if event.key == pygame.K_s:
                 self.parent_node.movementy[1] = 1   
 
-            if event.key == pygame.K_RETURN:
-                engine.display_tiles *= -1
+            # if event.key == pygame.K_RETURN:
+            #     engine.display_tiles *= -1
 
             if event.key == pygame.K_e:
                 self.parent_node.is_interacting = True
