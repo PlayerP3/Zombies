@@ -52,8 +52,7 @@ class Pynaccle(GameStateMachine):
         self.tileSize = None
 
     # def init(self,states:dict={},beginningState:str='START',tilemapPath:str='',classMappings:dict={},player:object=None,tileSize:int=32):
-    def init(self,states:dict={},beginningState:str='SPLASH'):
-
+    def init(self,states:dict={},beginningState:str='SPLASH',tilemapJSON:str='',classMappings:dict={}):
 
         # set states
         self.states = states
@@ -64,6 +63,10 @@ class Pynaccle(GameStateMachine):
     
         # set first state and enter
         self.state = self.states[beginningState]
+
+        self.tilemapProcessor.load_tilemap(tileampJSON=tilemapJSON,classMappings=classMappings)
+
+
 
 
 

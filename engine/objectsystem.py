@@ -11,6 +11,7 @@ class ObjectSystem():
         # get active pools
         self.active_pool = []
         self.inactive_pool = {}
+        self.inactiveNoPool = []
 
         # path cache for objs
         self.path_cache = {}
@@ -32,7 +33,14 @@ class ObjectSystem():
 
             if to_remove:
                 for gameobj in to_remove:
-                    gameobj.kill(self.active_pool,self.inactive_pool[gameobj.__class__.__name__])
+
+                    if gameobj.__class__.__name__ in self.inactive_pool:
+
+                        gameobj.kill(self.active_pool,self.inactive_pool[gameobj.__class__.__name__])
+
+                    else:
+                        self.active_pool.remove(gameobj)
+                        self.inactiveNoPool.append(gameobj)
 
 
     # def draw_tilemap(self):

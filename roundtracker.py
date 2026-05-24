@@ -57,7 +57,7 @@ class Round_Tracker(RoundTrackerStateMachine):
         self.round_number = 0
 
         # store spawn locations
-        self.spawnLocations = [(120,256)]
+        self.spawnLocations = [(20,96)]
 
         # keeps track of the number of entities that have been spawned since the round started
         self.totalSpawnedInRound = 0

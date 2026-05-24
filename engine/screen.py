@@ -17,6 +17,9 @@ class Screen():
         # set windows var
         self.windows = {}
 
+        # bg surfaces and the chunks they beloing to
+        self.bgSurface = {}
+
     # function to add window
     def add_window(self,winName:str,width:int,height:int,pos:tuple):
 
@@ -167,8 +170,6 @@ class Window():
                 (ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].y *self.zoom )+ self.bg_offset_y,
                 ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].width*self.zoom,
                 ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].height*self.zoom)
-
-                print(adjusted_position_rect)
                 
 
                 # draw rects
@@ -217,4 +218,36 @@ class Window():
 
         self.drawing_queue = {k:self.drawing_queue[k] for k in self.drawing_queue if not self.drawing_queue[k]['schedule_deletion']}
 
+
+    def draw_surface(self,asset_to_draw,asset_type:str='surface',game_object_origin:str='game',is_animated:bool=False,schedule_deletion:bool=True,
+                       animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,
+                       zlayer:int=-1,ignoreCameraOffset:bool=False,alpha:int=255):
+
+        position = (position[0] - (self.win.get_width()/gameScreen.windows['win'].zoom)//2,position[1]- (self.win.get_height()//gameScreen.windows['win'].zoom)//2)
+
+        random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+
+
+        self.drawing_queue[random_id] = {'game_object':'obj',
+                                        'asset_to_draw':asset_to_draw,
+                                        'asset_type':asset_type,
+                                        'z_layer':zlayer,
+                                        'game_object_origin':game_object_origin,
+                                        'is_animated':is_animated,
+                                        'animation_length':animation_length,
+                                        'animation_timer':animation_length,
+                                        'position':position,
+                                        'position_rect':0,
+                                        'value':value,
+                                        'is_critical':is_critical,
+                                        'sin_waveY':0,
+                                        'sin_waveX':0,
+                                        'sin_waveX_movement':random.choice(['positive','negative']),
+                                        'initial_width':initial_width,
+                                        'initial_height':initial_height,
+                                        'scale_factor_timer':1,
+                                        'alpha':alpha,
+                                        'ignore_offset':ignoreCameraOffset,
+                                        'schedule_deletion':schedule_deletion}
+    
 gameScreen = Screen()

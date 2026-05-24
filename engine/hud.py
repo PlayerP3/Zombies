@@ -68,7 +68,7 @@ class HUD():
 
 class HUD_element(AnimatedSprite):
 
-    def __init__(self,win_pos:tuple=(0,0)):
+    def __init__(self,win_pos:tuple=(0,0),winPosWidthRatio:float=0,winPosHeightRatio:float=0,winPosWidthOffsetRatio:float=0,winPosHeightOffsetRatio:float=0):
 
         AnimatedSprite.__init__(self)
 
@@ -76,12 +76,18 @@ class HUD_element(AnimatedSprite):
         # the position is always 
         self.display = True
 
-        # this is the position on the win, not the surface it is drawn on
-        self.win_pos = win_pos
-
         # linked var or object that helps control what is displayed and how
         self.linked_obj = None
         self.linked_var = None
+
+        self.win_pos = win_pos
+        self.winPosWidthRatio = winPosWidthRatio
+        self.winPosHeightRatio = winPosHeightRatio
+
+        self.winPosWidthOffsetRatio = winPosWidthOffsetRatio
+        self.winPosHeightOffsetRatio = winPosHeightOffsetRatio
+
+        
 
         # list of functions we will execute
         self.extraProcessing = []
@@ -98,12 +104,20 @@ class HUD_element(AnimatedSprite):
 
         self.hurtbox.width = self.hurtbox_width
         self.hurtbox.height = self.hurtbox_height
+
+        # calculate win pos based on xpercentage and ypercentage on screen
+        x = (gameScreen.windows[self.surface_to_draw_on].win_width * (self.winPosWidthRatio)) - (gameScreen.windows[self.surface_to_draw_on].win_width * (self.winPosWidthOffsetRatio)) 
+        y = (gameScreen.windows[self.surface_to_draw_on].win_height * (self.winPosHeightRatio)) - (gameScreen.windows[self.surface_to_draw_on].win_height * (self.winPosHeightOffsetRatio)) 
+        
+        self.win_pos = (x,y)
         self.hurtbox.center = self.win_pos
 
         self.original_vars = {k:v for k,v in self.__dict__.items()}
 
     # function to update some preoprty about the hud
     def update(self):
+
+        self.win_pos
 
         if self.extraProcessing:
 

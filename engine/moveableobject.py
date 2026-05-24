@@ -363,6 +363,9 @@ class Moveable_Object(AnimatedSprite):
         self.is_active = True
         self.hurtbox.center = pos
 
+    def spawnL(self):
+        self.hurtbox.center = self.spawnLocation
+
     # # finding direction vector function, when you have a specific point
     # def find_direction_vector(self,point:tuple):
 

@@ -45,6 +45,7 @@ class AnimatedSprite():
         self.alpha_timer = Timer()
         self.sprite_offsetx = sprite_offsetx
         self.sprite_offsety = sprite_offsety
+        self.spawnLocation = (0,0)
         
 
         # rect is used for movement and collision
