@@ -1,25 +1,13 @@
 import pygame,os,re
-import pygame.freetype
 from pygame.math import Vector2
-from game import Game,engine
 from gun import guns
-# from Drawing_TileMaps import Creative_Mode,AnimatedSprite
-import random
-import math
-import sys
-import json
-from animatedsprite import AnimatedSprite,GameSprites
-import copy
-from deck import *
-from statemachine import StateMachine
+from engine.statemachine import StateMachine
 from States.Player.idle import Idle
 from States.Player.walking import Walking
 from States.Player.running import Running
-
-# from Bullets import Weapons,RightHandWeapons
-# from Orbitals import Orbital
-from moveableobject import Moveable_Object
-# from ItemBench import ItemPools,ItemPoolsReset,remove_from_itempool,add_to_itempool
+from engine.moveableobject import Moveable_Object
+from engine.utils import *
+from engine.screen import gameScreen
 pygame.font.init()
 
 ## USEFUL INFO
@@ -178,11 +166,13 @@ class Player(Moveable_Object,PlayerStateMachine):
         mouse_pos = pygame.mouse.get_pos()
 
         # adjust mouse position because of rescaling
-        x = mouse_pos[0]/(engine.windows.fullscreen_width/engine.windows.win_width) - engine.camera.bg_offset_x
-        y = mouse_pos[1]/(engine.windows.fullscreen_height/engine.windows.win_height) - engine.camera.bg_offset_y
+        x = (mouse_pos[0]/(gameScreen.fullscreen_width/gameScreen.windows[self.surface_to_draw_on].win.get_width()) - gameScreen.windows[self.surface_to_draw_on].bg_offset_x)/gameScreen.windows[self.surface_to_draw_on].zoom
+        y = (mouse_pos[1]/(gameScreen.fullscreen_height/gameScreen.windows[self.surface_to_draw_on].win.get_height()) - gameScreen.windows[self.surface_to_draw_on].bg_offset_y)/gameScreen.windows[self.surface_to_draw_on].zoom
 
         self.shooting_target_position = (x,y)
         self.weapon.shooting_start_position = self.hurtbox.center
+
+        print(x,y)
 
     # swap weapon function
     def swap_weapon(self):

@@ -1,10 +1,9 @@
 import json,random,sys
-from moveableobject import Moveable_Object
-from animatedsprite import AnimatedSprite
-from game import engine
-from utils import *
-from pygame.math import Vector2
-from statemachine import StateMachine
+from engine.moveableobject import Moveable_Object
+from engine.animatedsprite import AnimatedSprite
+from engine.utils import *
+from engine.statemachine import StateMachine
+from engine.objectsystem import objectManager
 from States.Interactable.idle import Idle
 from States.Interactable.interacting import Interacting
 
@@ -128,9 +127,9 @@ class Interactable(Moveable_Object,InteractableStateMachine):
 
 
 # add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
-engine.inactive_pool["Interactable"] = [Interactable() for _ in range(300)]
+objectManager.inactive_pool["Interactable"] = [Interactable() for _ in range(300)]
 
-miscobj = engine.inactive_pool['Interactable'][0]
+miscobj = objectManager.inactive_pool['Interactable'][0]
 
 # spawns = [(-48,-48),(-220,-100),(100,220),(500,100)]
 spawns = [(0,0)]
@@ -142,6 +141,6 @@ store_original_vars(game_object=miscobj)
 
 miscobj.spawn(random.choice(spawns))
 
-engine.active_pool.append(miscobj)
-engine.inactive_pool['Interactable'].remove(miscobj)
+objectManager.active_pool.append(miscobj)
+objectManager.inactive_pool['Interactable'].remove(miscobj)
 

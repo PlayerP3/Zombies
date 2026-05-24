@@ -1,6 +1,7 @@
 import json,sys
-from utils import *
-from moveableobject import Moveable_Object
+from engine.utils import *
+from engine.moveableobject import Moveable_Object
+from engine.objectsystem import objectManager
 
 with open('config_wall.json','r') as wall_attributes_file:
 
@@ -109,6 +110,6 @@ store_original_vars(game_object=walle)
 
 walle.spawn((48,48))
 
-engine.active_pool.append(walle)
+objectManager.active_pool.append(walle)
 
 

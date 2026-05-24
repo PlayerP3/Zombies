@@ -1,18 +1,10 @@
-import pygame,os,re
-import pygame.freetype
+import pygame,json
 from pygame.math import Vector2
-from game import Game,engine
 from pathfinding import Pathfinding
-# from Drawing_TileMaps import Creative_Mode,AnimatedSprite
-import random
-import math
-import sys
-import json
-from animatedsprite import AnimatedSprite,GameSprites
-import copy
-from moveableobject import Moveable_Object
-from utils import *
-from statemachine import StateMachine
+from engine.moveableobject import Moveable_Object
+from engine.utils import *
+from engine.statemachine import StateMachine
+from engine.objectsystem import objectManager
 from States.Enemy.idle import Idle
 from States.Enemy.chasing import Chasing
 from States.Enemy.roaming import Roaming
@@ -135,7 +127,7 @@ class Enemy(Moveable_Object,Pathfinding,EnemyStateMachine):
             # handle collisions with the wall and entities
             # self.enemy_collision_rects()
             # self.pathing_end_position_target = (48,-48)
-            self.pathing_end_position_target = engine.player.hurtbox.center
+            self.pathing_end_position_target = objectManager.player.hurtbox.center
 
 
             # determine the pathing the entity is going to be using
@@ -153,5 +145,5 @@ class Enemy(Moveable_Object,Pathfinding,EnemyStateMachine):
             self.draw_rect(position=self.hurtbox.center)
 
 
-engine.inactive_pool["Enemy"] = [Enemy() for _ in range(50)]
+objectManager.inactive_pool["Enemy"] = [Enemy() for _ in range(50)]
 

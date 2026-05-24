@@ -1,16 +1,9 @@
 import pygame,os,re,sys
 from pygame.math import Vector2
-from game import engine
-from utils import *
-import random
-import math
+from engine.utils import *
+from engine.objectsystem import objectManager
 import json
-import string
-import copy
 import numpy as np
-from moveableobject import Moveable_Object
-from interactable import Interactable,Idle,Interacting
-from animatedsprite import GameSprites
 from item import Item
 from gun import guns
 # from miscsprites import MiscellaneousMgr
@@ -85,13 +78,13 @@ class Wallbuy(Item):
     def update_data(self):
 
         # if player does not have weapon in their inventory, display buy
-        if self.name in engine.player.allWeapons:
+        if self.name in objectManager.player.allWeapons:
             self.cost = self.ammoCost
             self.display_message.img_path = f"Hold E to buy ammo [Cost:{self.cost}]"
 
 
         # if player has weapon in their inventory display ammo
-        elif self.name not in engine.player.allWeapons:
+        elif self.name not in objectManager.player.allWeapons:
             self.cost = self.weaponCost
             self.display_message.img_path = f"Hold E to buy {self.name} [Cost:{self.cost}]"
 
@@ -142,6 +135,6 @@ for wb in wallbuy_parameters:
 
     wbobj.spawn(pos=wallbuy_parameters[wb]['pos'])
 
-    engine.active_pool.append(wbobj)
+    objectManager.active_pool.append(wbobj)
 
 

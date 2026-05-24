@@ -1,19 +1,7 @@
-import pygame,os,re,sys
-from pygame.math import Vector2
-from game import engine
-from utils import *
-import random
-import math
+from engine.utils import *
 import json
-import string
-import copy
-import numpy as np
-from moveableobject import Moveable_Object
+from engine.moveableobject import Moveable_Object
 from interactable import Interactable,Idle,Interacting
-from animatedsprite import GameSprites
-from item import Item
-from gun import guns
-# from miscsprites import MiscellaneousMgr
 
 # load in parameters
 with open('config_wallbuy.json','r') as wallbuy_attributes_file:

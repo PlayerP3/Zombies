@@ -1,10 +1,10 @@
 import pygame,random,json,os,math,sys
 from pygame.math import Vector2
-from moveableobject import Moveable_Object
-from game import engine
-from utils import *
-from timer import Timer
-from animatedsprite import AnimatedSprite
+from engine.moveableobject import Moveable_Object
+from engine.utils import *
+from engine.timer import Timer
+from engine.objectsystem import objectManager
+
 # from statemachine import StateMachine
 
 
@@ -308,10 +308,10 @@ class Weapon():
             for i in range(len(self.final_endpoints)):
 
                 # set a bullet to be the first thing in the inacitve pool
-                bullet = engine.inactive_pool[bullet_object][i]
+                bullet = objectManager.inactive_pool[bullet_object][i]
 
                 # third conditional means we only ever try to run this code if there is atually a bullet in the inactive pool to use
-                if not bullet.is_active and not bullet.fired and engine.inactive_pool[bullet_object]: # second condiitonal prevents bullet being fired twice until reload. this is important because after bullets collided they are sent back to the inactive pool, but we dont want inactive bullets that have already been fired
+                if not bullet.is_active and not bullet.fired and objectManager.inactive_pool[bullet_object]: # second condiitonal prevents bullet being fired twice until reload. this is important because after bullets collided they are sent back to the inactive pool, but we dont want inactive bullets that have already been fired
 
                     # set projectile manager
                     bullet.projectile_manager = self
@@ -358,7 +358,7 @@ class Weapon():
                     self.projectile_queue.append(bullet)
                     
                     # remove bullet obj from inactive pool
-                    engine.inactive_pool[bullet_object].remove(bullet)
+                    objectManager.inactive_pool[bullet_object].remove(bullet)
 
                     # remove one from the display ammo because a bullet has been shot
                     self.bullets_remaining_in_mag -= 1
@@ -411,7 +411,7 @@ class Weapon():
                 for blt in to_remove:
 
                     # remove from queue and add to acitve pool
-                    engine.active_pool.append(blt)
+                    objectManager.active_pool.append(blt)
                     self.projectile_queue.remove(blt)
 
             # if empty start burst countdown to prevent shooting
@@ -443,7 +443,7 @@ class Weapon():
                 for blt in to_remove:
 
                     # remove from queue and add to acitve pool
-                    engine.active_pool.append(blt)
+                    objectManager.active_pool.append(blt)
                     self.projectile_queue.remove(blt)
 
             # if empty start burst countdown to prevent shooting
@@ -611,17 +611,17 @@ class Bullet(Moveable_Object):
             self.projectile_manager.wielded_by.money += self.moneyOnHit
 
 
-        # init damage number
-        if engine.display_dmg_num == 1:
-            dmgnum = engine.inactive_pool['DamageNumber'][0]
-            dmgnum.init(f"{damage}")
-            dmgnum.spawn(gameobj.hurtbox.center)
-            dmgnum.update_movement_vectors(unique_id='movement',direction_vectorX=0,
-                                            direction_vectorY=-1,acceleration=self.acceleration,Xcceleration_rate=0,
-                                            Xcceleration_rate_change='negative',
-                                            max_value=self.acceleration,reduce_on_wall_collision=False,reset_on_max_value=False)
-            engine.inactive_pool['DamageNumber'].remove(dmgnum)
-            engine.active_pool.append(dmgnum)
+        # # init damage number
+        # if engine.display_dmg_num == 1:
+        #     dmgnum = engine.inactive_pool['DamageNumber'][0]
+        #     dmgnum.init(f"{damage}")
+        #     dmgnum.spawn(gameobj.hurtbox.center)
+        #     dmgnum.update_movement_vectors(unique_id='movement',direction_vectorX=0,
+        #                                     direction_vectorY=-1,acceleration=self.acceleration,Xcceleration_rate=0,
+        #                                     Xcceleration_rate_change='negative',
+        #                                     max_value=self.acceleration,reduce_on_wall_collision=False,reset_on_max_value=False)
+        #     engine.inactive_pool['DamageNumber'].remove(dmgnum)
+        #     engine.active_pool.append(dmgnum)
 
 
 

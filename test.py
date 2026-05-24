@@ -125,7 +125,8 @@ print(x.z)
 print(x.original_vars)
 
 
-import moveableobject
 
 x = {'class':'Wall'}
 
+import engine.pens as p
+print(p.penHolder)

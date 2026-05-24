@@ -1,14 +1,9 @@
-import pygame,os,re,sys
+import random,math,string
 from pygame.math import Vector2
-from game import engine
-# from miscsprites import MiscellaneousInactivePools,MiscellaneousMgr
-from utils import *
-import random
-import math
-import json
-import string
-import copy
-import numpy as np
+from engine.objectsystem import objectManager
+from engine.utils import *
+from engine.screen import gameScreen
+
 
 class Raycast():
 
@@ -70,9 +65,9 @@ class Raycast():
             # get all objects on the intersected tiles
             for tile in list(set(intersected_tiles)):
                 
-                if tile in engine.object_positions:
+                if tile in objectManager.object_positions:
 
-                    self.objects_colliding_with_raycast[rnum].extend(engine.object_positions[tile])
+                    self.objects_colliding_with_raycast[rnum].extend(objectManager.object_positions[tile])
 
         # filter objects colldied with
         self.filter_objects_colliding_with_raycast()
@@ -190,7 +185,7 @@ class Raycast():
             # draw triangles and fill with white so we can see everything not in the fog
             self.draw_polygon(endpoints=fow_endpoints,ignore_offset=False)
 
-        engine.windows.fog_of_war_surface.fill((0,0,0))
+        gameScreen.windows['fog_of_war'].win.fill((0,0,0))
         
         # draw wincopy onto fog surface
         self.draw_fog_onto_copy(ignore_offset=True)
@@ -198,19 +193,18 @@ class Raycast():
         # draw fog of war surface
         self.draw_surface(ignore_offset=True)
 
-    def draw_fog_onto_copy(self,asset_type:str='surface',surface_to_draw_on=engine.windows.fog_of_war_surface,game_object_origin:str='game',is_animated:bool=False,
+    def draw_fog_onto_copy(self,asset_type:str='surface',game_object_origin:str='game',is_animated:bool=False,
                        animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,
                        zlayer:int=0,alpha:int=100,ignore_offset:bool=False):
 
-        pos_rect = engine.windows.win.get_frect(center=position)
+        pos_rect = gameScreen.windows['win'].win.get_frect(center=position)
 
         random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
 
-        engine.drawing_queue[random_id] = {'game_object':'obj',
-                                        'asset_to_draw':engine.windows.win_copy,
+        gameScreen.windows['fog_of_war'].drawing_queue[random_id] = {'game_object':'obj',
+                                        'asset_to_draw':gameScreen.windows['wincopy'].win,
                                         'asset_type':asset_type,
                                         'z_layer':zlayer,
-                                        'surface_to_draw_on':surface_to_draw_on,
                                         'game_object_origin':game_object_origin,
                                         'is_animated':is_animated,
                                         'animation_length':animation_length,
@@ -230,19 +224,18 @@ class Raycast():
                                         'schedule_deletion':True}
         
     # adjust alpha on fog of war surface to determien if we see objects like transparency wise
-    def draw_surface(self,asset_type:str='surface',surface_to_draw_on=engine.windows.win,game_object_origin:str='game',is_animated:bool=False,
+    def draw_surface(self,asset_type:str='surface',game_object_origin:str='game',is_animated:bool=False,
                        animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,
                        zlayer:int=2,alpha:int=100,ignore_offset:bool=False):
 
-        pos_rect = engine.windows.win.get_frect(center=position)
+        pos_rect = gameScreen.windows['fog_of_war'].win.get_frect(center=position)
 
         random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
 
-        engine.drawing_queue[random_id] = {'game_object':'obj',
-                                        'asset_to_draw':engine.windows.fog_of_war_surface,
+        gameScreen.windows['win'].drawing_queue[random_id] = {'game_object':'obj',
+                                        'asset_to_draw':gameScreen.windows['fog_of_war'].win,
                                         'asset_type':asset_type,
                                         'z_layer':zlayer,
-                                        'surface_to_draw_on':surface_to_draw_on,
                                         'game_object_origin':game_object_origin,
                                         'is_animated':is_animated,
                                         'animation_length':animation_length,
@@ -261,19 +254,18 @@ class Raycast():
                                         'ignore_offset':ignore_offset,
                                         'schedule_deletion':True}
         
-    def draw_polygon(self,asset_type:str='polygon',surface_to_draw_on=engine.windows.fog_of_war_surface,game_object_origin:str='game',is_animated:bool=False,
+    def draw_polygon(self,asset_type:str='polygon',game_object_origin:str='game',is_animated:bool=False,
                     animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,endpoints:list=[],
                     zlayer:int=1,alpha:int=255,ignore_offset:bool=False):
 
-        pos_rect = engine.windows.win.get_frect(center=position)
+        pos_rect = gameScreen.windows['win'].win.get_frect(center=position)
 
         random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
 
-        engine.drawing_queue[random_id] = {'game_object':'obj',
+        gameScreen.windows['fog_of_war'].drawing_queue[random_id] = {'game_object':'obj',
                                         'asset_to_draw':None,
                                         'asset_type':asset_type,
                                         'z_layer':zlayer,
-                                        'surface_to_draw_on':surface_to_draw_on,
                                         'game_object_origin':game_object_origin,
                                         'is_animated':is_animated,
                                         'animation_length':animation_length,
@@ -293,7 +285,7 @@ class Raycast():
                                         'ignore_offset':ignore_offset,
                                         'schedule_deletion':True}
 
-    def draw_lines(self,asset_to_draw=None,asset_type:str='line',surface_to_draw_on:str=engine.windows.win,game_object_origin:str='Map',is_animated:bool=False,
+    def draw_lines(self,asset_to_draw=None,asset_type:str='line',game_object_origin:str='Map',is_animated:bool=False,
                        animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,z_layer:int=2):
 
         for rnum in self.raynumber_ray:
@@ -305,11 +297,10 @@ class Raycast():
             random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
 
 
-            engine.drawing_queue[random_id] = {'game_object':'Dmg num',
+            gameScreen.windows['win'].drawing_queue[random_id] = {'game_object':'Dmg num',
                                                         'asset_to_draw':asset_to_draw,
                                                         'asset_type':asset_type,
                                                         'z_layer':z_layer,
-                                                        'surface_to_draw_on':surface_to_draw_on,
                                                         'game_object_origin':game_object_origin,
                                                         'is_animated':is_animated,
                                                         'animation_length':animation_length,
@@ -359,4 +350,4 @@ class Raycast():
             
             if len(endpoints) > 2:
             
-                self.draw_polygon(surface_to_draw_on=engine.windows.win,zlayer=5,endpoints=endpoints)
+                self.draw_polygon(zlayer=5,endpoints=endpoints)

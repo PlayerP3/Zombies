@@ -1,19 +1,8 @@
-import pygame,os,re
-import pygame.freetype
-from pygame.math import Vector2
-from game import Game,engine
-from timer import Timer
-from pathfinding import Pathfinding
-# from Drawing_TileMaps import Creative_Mode,AnimatedSprite
-import random
-import math
-import sys
-import json
-from animatedsprite import AnimatedSprite,GameSprites
-import copy
-from moveableobject import Moveable_Object
-from utils import *
-from statemachine import StateMachine
+import pygame,math,random,json
+from engine.timer import Timer
+from engine.utils import *
+from engine.statemachine import StateMachine
+from engine.objectsystem import objectManager
 from States.RoundTracker.bossfight import BossFight
 from States.RoundTracker.easteregg import EasterEgg
 from States.RoundTracker.roundinprogress import RoundInProgress
@@ -176,7 +165,7 @@ class Spawner(Timer):
     def spawn_enemy(self):
 
         # get enemy type still alive
-        enemyTypeAlive = [e for e in engine.active_pool if (e.__class__.__name__ == self.enemyType and e.object_of_origin == 'Enemy')]
+        enemyTypeAlive = [e for e in objectManager.active_pool if (e.__class__.__name__ == self.enemyType and e.object_of_origin == 'Enemy')]
 
         # find if all enemies are dead and then add the total number that were spawned to the round tracker
         if (len(enemyTypeAlive) == 0) and (self.numberSpawned == self.totalToSpawn):
@@ -191,7 +180,7 @@ class Spawner(Timer):
         # if limit for enemy hasnt been reached, or if the amount of enemies in the actie pool is the active enemy limit
         if self.timer_complete and ((self.numberSpawned < self.totalToSpawn) and (len(enemyTypeAlive) < self.maxAllowedAlive)):
 
-            enemy_object = engine.inactive_pool[self.enemyType][0]
+            enemy_object = objectManager.inactive_pool[self.enemyType][0]
 
             # init object
             set_attributes(game_object=enemy_object,attributes=enemy_parameters['Enemy'])
@@ -199,8 +188,8 @@ class Spawner(Timer):
             store_original_vars(game_object=enemy_object)
             enemy_object.spawn(random.choice(self.parent_node.spawnLocations))
 
-            engine.active_pool.append(enemy_object)
-            engine.inactive_pool[self.enemyType].remove(enemy_object)
+            objectManager.active_pool.append(enemy_object)
+            objectManager.inactive_pool[self.enemyType].remove(enemy_object)
 
             self.numberSpawned += 1
 

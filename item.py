@@ -1,14 +1,9 @@
-import pygame,os,re,sys
+
 from pygame.math import Vector2
-from game import engine
-from utils import *
-import random
-import math
-import json
-import string
-import copy
-import numpy as np
-from moveableobject import Moveable_Object
+from engine.utils import *
+import random,json
+from engine.moveableobject import Moveable_Object
+from engine.objectsystem import objectManager
 from interactable import Interactable,Idle,Interacting
 # from miscsprites import MiscellaneousMgr
 
@@ -67,9 +62,9 @@ class Item(Interactable):
 
 
 # add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
-engine.inactive_pool["Item"] = [Item() for _ in range(300)]
+objectManager.inactive_pool["Item"] = [Item() for _ in range(300)]
 
-miscobj = engine.inactive_pool['Item'][0]
+miscobj = objectManager.inactive_pool['Item'][0]
 
 # spawns = [(-48,-48),(-220,-100),(100,220),(500,100)]
 spawns = [(-224,100)]
@@ -80,7 +75,7 @@ store_original_vars(game_object=miscobj)
 
 miscobj.spawn(random.choice(spawns))
 
-engine.active_pool.append(miscobj)
-engine.inactive_pool['Item'].remove(miscobj)
+objectManager.active_pool.append(miscobj)
+objectManager.inactive_pool['Item'].remove(miscobj)
 
 

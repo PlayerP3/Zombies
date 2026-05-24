@@ -3,12 +3,11 @@
 # always be checking your shortest route with what is at the top of the priority queue
 # # the final graph contains the coordinates for a given node and its object
 
-import random
-import sys
-import pygame
-from utils import *
-from timer import Timer
-from game import engine
+from engine.utils import *
+from engine.timer import Timer
+from engine.tilemap import tilemapProcessor
+from engine.globs import *
+from engine.objectsystem import objectManager
 # from utils import *
 # from Drawing_TileMaps import engine
 
@@ -31,14 +30,14 @@ def cmpT(t1, t2):
 # function to build astar graph
 def build_astar_graph():
 
-    for tile in engine.accessible_tiles:
+    for tile in tilemapProcessor.accessible_tiles:
 
-        engine.astar_graph[tile] = Node()
+        tilemapProcessor.astar_graph[tile] = Node()
 
 # function to build true clearance graph
 def build_true_clearance_graph():
 
-    for tile in engine.astar_graph:
+    for tile in tilemapProcessor.astar_graph:
 
         clearance = 1
 
@@ -49,7 +48,7 @@ def build_true_clearance_graph():
         subtiles = breakdown_rect(tile,rect_width=rect[3],rect_height=rect[2],tile_size=32)
 
         # subtract walls list from subtiles
-        subtiles_without_walls = list(set(subtiles) - set(engine.inaccessible_tiles))
+        subtiles_without_walls = list(set(subtiles) - set(tilemapProcessor.inaccessible_tiles))
 
         while len(subtiles_without_walls) == len(subtiles):
 
@@ -63,11 +62,11 @@ def build_true_clearance_graph():
             subtiles = breakdown_centered_rect(point=(centered_rect[0],centered_rect[1]),rect_width=centered_rect[3],rect_height=centered_rect[2],tile_size=32)
 
             # subtract walls list from subtiles
-            subtiles_without_walls = list(set(subtiles) - set(engine.inaccessible_tiles))
+            subtiles_without_walls = list(set(subtiles) - set(tilemapProcessor.inaccessible_tiles))
 
             clearance += 1
 
-        engine.astar_graph[tile].clearance = clearance
+        tilemapProcessor.astar_graph[tile].clearance = clearance
 
 
 
@@ -142,25 +141,25 @@ class Node():
         x = int(x)
         y = int(y)
 
-        east_neighbour = (x+engine.tile_size,y)
-        south_neighbour = (x,y+engine.tile_size)
-        north_neighbour = (x,y-engine.tile_size)
-        west_neighbour = (x-engine.tile_size,y)
+        east_neighbour = (x+tileSize,y)
+        south_neighbour = (x,y+tileSize)
+        north_neighbour = (x,y-tileSize)
+        west_neighbour = (x-tileSize,y)
 
         # update what we save the tile as dpeending on if it is a tile that can be moved to
-        if east_neighbour not in engine.accessible_tiles:
+        if east_neighbour not in tilemapProcessor.accessible_tiles:
 
             east_neighbour = None
 
-        if south_neighbour not in engine.accessible_tiles:
+        if south_neighbour not in tilemapProcessor.accessible_tiles:
 
             south_neighbour = None
 
-        if west_neighbour not in engine.accessible_tiles:
+        if west_neighbour not in tilemapProcessor.accessible_tiles:
 
             west_neighbour = None
 
-        if north_neighbour not in engine.accessible_tiles:
+        if north_neighbour not in tilemapProcessor.accessible_tiles:
 
             north_neighbour = None
 
@@ -226,22 +225,22 @@ class Pathfinding():
     def a_star(self,start:tuple,end:tuple):
 
         # if end or start not in all tiles just retur an empty list for pathing
-        if start not in engine.accessible_tiles or end not in engine.accessible_tiles:
+        if start not in tilemapProcessor.accessible_tiles or end not in tilemapProcessor.accessible_tiles:
             return []
         
         # if the object does not have enough clearance to reach the end point
-        if self.clearance > engine.astar_graph[end].clearance:
+        if self.clearance > tilemapProcessor.astar_graph[end].clearance:
             
             new_end = None
 
             # find the closest node to the end node that has enough clearance
-            closest_nodes = sorted(engine.astar_graph.keys(),key= lambda x:(Vector2(x)-Vector2(end)).length()) 
+            closest_nodes = sorted(tilemapProcessor.astar_graph.keys(),key= lambda x:(Vector2(x)-Vector2(end)).length()) 
 
             # go thruogh nodes based on their distance to object
             for node in closest_nodes:
 
                 # check if clearance is equal to or greater than object clearance
-                if self.clearance <= engine.astar_graph[node].clearance:
+                if self.clearance <= tilemapProcessor.astar_graph[node].clearance:
 
                     new_end = node
 
@@ -278,7 +277,7 @@ class Pathfinding():
         # create first instance of astra graph
 
         # update node values in astar graph
-        engine.astar_graph[current_node].init({'topleftcoors':current_node,
+        tilemapProcessor.astar_graph[current_node].init({'topleftcoors':current_node,
                                                'cost':calculate_manhattan(current_node,start),
                                                'heuristic':calculate_manhattan(current_node,end)}) 
 
@@ -294,7 +293,7 @@ class Pathfinding():
             # set the current node to whatever has the lowest f cost / total cost in the open list
             # first sort the open stack based on what has the lowest f cost function. THe one with the lowest f cost function becomes closed and is added to the closed stack
 
-            open_stack = sorted(open_stack, key=lambda x: engine.astar_graph[x].total)
+            open_stack = sorted(open_stack, key=lambda x: tilemapProcessor.astar_graph[x].total)
 
             # print(f'Open stack is {open_stack}')
             # print(f'Start point is {open_stack}, closed stack is {closed_stack}')
@@ -320,10 +319,10 @@ class Pathfinding():
                 while start not in final_path:
 
                     # add the previous node (the node that was expanded to reach the current node) to the final path
-                    final_path.append(engine.astar_graph[node_tracker].previous_node)
+                    final_path.append(tilemapProcessor.astar_graph[node_tracker].previous_node)
 
                     # now set the current node in the tracing back to be that previous node
-                    node_tracker = engine.astar_graph[node_tracker].previous_node
+                    node_tracker = tilemapProcessor.astar_graph[node_tracker].previous_node
 
                     # print(node_tracker)
 
@@ -335,11 +334,11 @@ class Pathfinding():
           
                 # because the final path list starts from the end node and works its way back the path that the entity has to follow is actually starting from the end point
                 # to prevent that we reverse the final path order so it starts form the start node. return twice because two variables need this information
-                return [engine.astar_graph[p].center_coors for p in final_path[::-1]]
+                return [tilemapProcessor.astar_graph[p].center_coors for p in final_path[::-1]]
             
             # set neighboiurs for current node,
             # print(f'List comprehenstion neighbours = {astar_graph[current_node].neighbours}')
-            neighbour_nodes = [node for node in engine.astar_graph[current_node].neighbours if node]
+            neighbour_nodes = [node for node in tilemapProcessor.astar_graph[current_node].neighbours if node]
 
             # print(engine.astar_graph[current_node].neighbours)
 
@@ -363,19 +362,19 @@ class Pathfinding():
                     continue
 
                 # update 
-                engine.astar_graph[neighbour].init({'topleftcoors':neighbour,
+                tilemapProcessor.astar_graph[neighbour].init({'topleftcoors':neighbour,
                                                'cost':calculate_manhattan(neighbour,start),
                                                'heuristic':calculate_manhattan(neighbour,end)}) 
 
                 # if the node is not in the open stack meaning they havent been put up as an option to move to yet or if the cost to this node is smaller than the cost for the current node then we can consider it as a possible option in the open stack
-                if (neighbour not in open_stack or (engine.astar_graph[neighbour].total < engine.astar_graph[current_node].total)) and engine.astar_graph[neighbour].clearance > self.clearance:
+                if (neighbour not in open_stack or (tilemapProcessor.astar_graph[neighbour].total < tilemapProcessor.astar_graph[current_node].total)) and tilemapProcessor.astar_graph[neighbour].clearance > self.clearance:
 
                     # print(neighbour)
                     # print(engine.astar_graph[neighbour].clearance)
                     # print(self.clearance)
                     # make the parent of the node be the current node right now
                     # astar_graph[current_node].previous_node = node
-                    engine.astar_graph[neighbour].previous_node = current_node
+                    tilemapProcessor.astar_graph[neighbour].previous_node = current_node
 
                     # if the node isnt already in the open stack, meaning if it is not
                     open_stack.append(neighbour)
@@ -386,21 +385,21 @@ class Pathfinding():
     
     def bigger_than_tile_size(self,node:Node):
 
-        if self.hitbox.height > engine.tile_size:
+        if self.hitbox.height > tileSize:
             pass
     
     def bigger_than_tile_size(self,node:Node):
 
-        if self.hitbox.height > engine.tile_size:
+        if self.hitbox.height > tileSize:
 
             x = int(node.topleftcoors[0])
             y = int(node.topleftcoors[1])
 
-            south_neighbour = (x,y+engine.tile_size)
-            north_neighbour = (x,y-engine.tile_size)
+            south_neighbour = (x,y+tileSize)
+            north_neighbour = (x,y-tileSize)
 
             # if wall
-            if north_neighbour not in engine.accessible_tiles or south_neighbour not in engine.accessible_tiles:
+            if north_neighbour not in tilemapProcessor.accessible_tiles or south_neighbour not in tilemapProcessor.accessible_tiles:
 
                 node.total += 100
         # if hitbox bigger than tile size 
@@ -622,10 +621,10 @@ class Pathfinding():
 
         # go through each path in the cache and check if the start and end point is equal to the current start and end point
         # for path in path_cache:
-        if key_for_cache in engine.path_cache:
+        if key_for_cache in objectManager.path_cache:
 
             # get path from the cache
-            path = engine.path_cache[key_for_cache]
+            path = objectManager.path_cache[key_for_cache]
 
             # we only care if at least the start point is in the path and the end point must be at the end
             # this means if youre on a tile that belongs to a cached path, you dont need to run astar again
@@ -692,14 +691,14 @@ class Pathfinding():
         if new_path:
 
             # check whether that new key is already a key
-            if new_key not in engine.path_cache:
+            if new_key not in objectManager.path_cache:
 
                 # copy the path
                 copy_path = new_path.copy()
 
                 # add path to path cache
                 # self.path_cache.append(copy_path)
-                engine.path_cache[new_key] = copy_path
+                objectManager.path_cache[new_key] = copy_path
 
     
 
