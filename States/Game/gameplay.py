@@ -33,6 +33,8 @@ class Gameplay(State):
 
         # fill window
         self.parent_node.screenManager.windows['win'].win.fill((200,0,0))
+        # self.parent_node.screenManager.windows['win'].win.blit(self.parent_node.screenManager.windows['Chunk1'].win,(0,0))
+        self.parent_node.screenManager.windows['win'].draw_surface(self.parent_node.screenManager.windows['Chunk1'].win)
 
         # self.parent_node.screenManager.windows['win'].win_copy = self.parent_node.screenManager.windows['win']
 
