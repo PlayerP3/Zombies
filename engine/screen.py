@@ -60,8 +60,8 @@ class Window():
         
     # change camera view based on what is being shown
     def track_position(self):
-        self.bg_offset_x = self.win.get_width()//2 - self.focus[0]*self.zoom + self.extra_offset_x
-        self.bg_offset_y = self.win.get_height()//2 - self.focus[1]*self.zoom + self.extra_offset_y
+        self.bg_offset_x = self.win.get_width()//2 - self.focus[0]+ self.extra_offset_x
+        self.bg_offset_y = self.win.get_height()//2 - self.focus[1] + self.extra_offset_y
 
 
     # change camera based on obj
@@ -88,8 +88,8 @@ class Window():
         # Move object
         self.pos += self.movement
 
-        self.bg_offset_x = self.win.get_width()//2 - self.pos[0]/self.zoom + self.extra_offset_x
-        self.bg_offset_y = self.win.get_height()//2 - self.pos[1]/self.zoom + self.extra_offset_y
+        self.bg_offset_x = self.win.get_width()//2 - self.pos[0]*self.zoom + self.extra_offset_x
+        self.bg_offset_y = self.win.get_height()//2 - self.pos[1]*self.zoom + self.extra_offset_y
 
         
 
@@ -141,10 +141,10 @@ class Window():
                 adjusted_position = (0,0)
 
                 if not ZlayerSortedDrawingQueue[unique_id]['ignore_offset']:
-                    adjusted_position = ((ZlayerSortedDrawingQueue[unique_id]['position_rect'].x*self.zoom + self.bg_offset_x), (ZlayerSortedDrawingQueue[unique_id]['position_rect'].y*self.zoom+self.bg_offset_y))
+                    adjusted_position = ((ZlayerSortedDrawingQueue[unique_id]['position'][0]*self.zoom) + self.bg_offset_x, (ZlayerSortedDrawingQueue[unique_id]['position'][1]*self.zoom) +self.bg_offset_y)
 
                 elif ZlayerSortedDrawingQueue[unique_id]['ignore_offset']:
-                    adjusted_position = (ZlayerSortedDrawingQueue[unique_id]['position_rect'].x + self.win.get_width()//2, ZlayerSortedDrawingQueue[unique_id]['position_rect'].y + self.win.get_height()//2)
+                    adjusted_position = (ZlayerSortedDrawingQueue[unique_id]['position'][0]*self.zoom + self.win.get_width()//2, ZlayerSortedDrawingQueue[unique_id]['position'][1]*self.zoom + self.win.get_height()//2)
 
 
 
@@ -163,10 +163,12 @@ class Window():
             # if what we are drawing is going to be a rect
             elif ZlayerSortedDrawingQueue[unique_id]['asset_type'] == 'rect':
 
-                adjusted_position_rect = pygame.FRect((ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].x*self.zoom+ self.bg_offset_x)  ,
-                (ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].y *self.zoom + self.bg_offset_y),
-                ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].width,
-                ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].height)
+                adjusted_position_rect = pygame.FRect((ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].x*self.zoom)+ self.bg_offset_x ,
+                (ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].y *self.zoom )+ self.bg_offset_y,
+                ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].width*self.zoom,
+                ZlayerSortedDrawingQueue[unique_id]['asset_to_draw'].height*self.zoom)
+
+                print(adjusted_position_rect)
                 
 
                 # draw rects
@@ -192,7 +194,7 @@ class Window():
             # if what we are drawing is going to be a surface
             elif ZlayerSortedDrawingQueue[unique_id]['asset_type'] == 'lines':
 
-                points = [(p[0] + self.bg_offset_x, p[1] +  self.bg_offset_y) for p in ZlayerSortedDrawingQueue[unique_id]['points']]
+                points = [(p[0]*self.zoom + self.bg_offset_x, p[1]*self.zoom +  self.bg_offset_y) for p in ZlayerSortedDrawingQueue[unique_id]['points']]
 
                 pygame.draw.lines(self.win,color='blue',points=points,closed=False)
 
@@ -203,10 +205,10 @@ class Window():
                 adjusted_endpoints = []
 
                 if not ZlayerSortedDrawingQueue[unique_id]['ignore_offset']:
-                    adjusted_endpoints = [(e[0]+  self.bg_offset_x,e[1]+  self.bg_offset_y) for e in ZlayerSortedDrawingQueue[unique_id]['endpoints']]
+                    adjusted_endpoints = [(e[0]*self.zoom+  self.bg_offset_x,e[1]*self.zoom+ self.bg_offset_y) for e in ZlayerSortedDrawingQueue[unique_id]['endpoints']]
 
                 elif ZlayerSortedDrawingQueue[unique_id]['ignore_offset']:
-                    adjusted_endpoints = [(e[0]+  self.win.get_width()//2,e[1]+ +  self.win.get_height()//2) for e in ZlayerSortedDrawingQueue[unique_id]['endpoints']]
+                    adjusted_endpoints = [(e[0]*self.zoom+  self.win.get_width()//2,e[1]*self.zoom +  self.win.get_height()//2) for e in ZlayerSortedDrawingQueue[unique_id]['endpoints']]
 
 
                 pygame.draw.polygon(self.win,(255,255,255),adjusted_endpoints)

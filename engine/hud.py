@@ -1,5 +1,6 @@
 import pygame,random,os,string,numpy
 from .animatedsprite import AnimatedSprite,GameSprites
+from .screen import gameScreen
 
 class HUD():
 
@@ -34,9 +35,12 @@ class HUD():
                 if hud_element.display:
 
                     hud_element.update()
-                    hud_element.draw_surface(position=hud_element.win_pos,ignore_offset=True)
+                    hud_element.draw_surface(position=hud_element.hurtbox.center)
+
                     # draw rect for debugging 
-                    hud_element.draw_rect(position=hud_element.win_pos)
+                    hud_element.draw_rect()
+
+                    
 
 
                     self.active_elements.append(hud_element)

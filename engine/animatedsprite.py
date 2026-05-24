@@ -13,7 +13,7 @@ class AnimatedSprite():
 
     def __init__(self,zlayer_drawing:int=0,rect_colour:str='red',object_of_origin:str='Game',rect_width:float=23,rect_height:float=36,
                  hurtbox_width:float=23,hurtbox_height:float=36,sprite_offsetx:float=0,sprite_offsety:float=0,text_colour:str='green',
-                 surface_to_draw_on:str='win',penToUse='arial15',
+                 surface_to_draw_on:str='win',penToUse='arial15',ignoreCameraOffset:bool=False,
 
                  name:str='AnimatedSprite',img_path:str='Sprites/Cards/Hearts/1.png',img_width:int=32,img_width_scale:int=1,img_height:int=32,img_height_scale:int=1,
                  animation_delay:int=1,animation_speed:float=1,alpha:int=255,
@@ -34,6 +34,7 @@ class AnimatedSprite():
 
         # surf to draw on
         self.surface_to_draw_on = surface_to_draw_on
+        self.ignoreCameraOffset = ignoreCameraOffset
 
         # set sprite
         self.sprite = None
@@ -234,12 +235,12 @@ class AnimatedSprite():
         self.mask = pygame.mask.from_surface(self.sprite)
         self.mask_img = self.mask.to_surface()
 
-        # oldCenter = self.hurtbox.topleft
+        # oldCenter = self.hurtbox.center
 
-        self.hurtbox.width = self.hurtbox_width*gameScreen.windows[self.surface_to_draw_on].zoom
-        self.hurtbox.height = self.hurtbox_height*gameScreen.windows[self.surface_to_draw_on].zoom
+        # self.hurtbox.width = self.hurtbox_width*gameScreen.windows[self.surface_to_draw_on].zoom
+        # self.hurtbox.height = self.hurtbox_height*gameScreen.windows[self.surface_to_draw_on].zoom
 
-        # self.hurtbox.topleft = oldCenter
+        # self.hurtbox.center = oldCenter
     
 
     def update_sprite(self,SpriteCache:dict=GameSprites):
@@ -314,7 +315,7 @@ class AnimatedSprite():
 
     def draw_surface(self,asset_type:str='surface',game_object_origin:str='game',is_animated:bool=False,schedule_deletion:bool=True,
                        animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,
-                       zlayer:int=1,ignore_offset:bool=False):
+                       zlayer:int=1):
 
         # update sprite
         self.update_sprite()
@@ -325,11 +326,13 @@ class AnimatedSprite():
 
         if self.vertice == 'center':
 
-            pos_rect = self.sprite.get_frect(center=position)
+            # pos_rect = self.sprite.get_frect(center=position)#
+            position = (position[0] - (self.sprite.get_width()/gameScreen.windows[self.surface_to_draw_on].zoom)//2,position[1] - (self.sprite.get_height()//gameScreen.windows[self.surface_to_draw_on].zoom)//2)
 
         elif self.vertice == 'topleft':
 
-            pos_rect = self.sprite.get_frect(topleft=position)
+            # pos_rect = self.sprite.get_frect(topleft=position)
+            position = position
 
         random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
 
@@ -354,36 +357,8 @@ class AnimatedSprite():
                                         'initial_height':initial_height,
                                         'scale_factor_timer':1,
                                         'alpha':self.alpha,
-                                        'ignore_offset':ignore_offset,
+                                        'ignore_offset':self.ignoreCameraOffset,
                                         'schedule_deletion':schedule_deletion}
-
-    def draw_hitbox(self,asset_type:str='rect',surface_to_draw_on:str='mainwindow',game_object_origin:str='game',
-                  is_animated:bool=False,animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,rect_colour:str='blue',
-                  zlayer:int=1):
-
-        
-        gameScreen.windows[self.surface_to_draw_on].drawing_queue[f"{id(self)}_rect"] = {'game_object':self,
-                                                      'asset_to_draw':self.hitbox,
-                                                      'asset_type':asset_type,
-                                                      'z_layer':zlayer,
-                                                      'surface_to_draw_on':surface_to_draw_on,
-                                                      'game_object_origin':game_object_origin,
-                                                      'is_animated':is_animated,
-                                                      'animation_length':animation_length,
-                                                      'animation_timer':animation_length,
-                                                      'position':position,
-                                                      'position_rect':None,
-                                                      'value':value,
-                                                      'is_critical':is_critical,
-                                                      'sin_waveY':math.radians(90),
-                                                      'sin_waveX':0,
-                                                      'sin_waveX_movement':random.choice(['positive','negative']),
-                                                      'initial_width':None,
-                                                      'initial_height':None,
-                                                      'scale_factor_timer':1,
-                                                      'alpha_value':255,
-                                                      'rect_colour':rect_colour,
-                                                      'schedule_deletion':True}
 
     def draw_rect(self,asset_type:str='rect',game_object_origin:str='game',schedule_deletion:bool=True,
                   is_animated:bool=False,animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,rect_colour:str='blue',
