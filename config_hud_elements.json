@@ -15,6 +15,13 @@
 
         "vertice":"topleft",
         "surface_to_draw_on":"playeroverlay",
+
+        "winPosWidthRatio":0.05,
+        "winPosHeightRatio":0.1,
+
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
+
     
         "win_pos":[50,100]},
 
@@ -36,6 +43,11 @@
         "surface_to_draw_on":"playeroverlay",
 
         "vertice":"center",
+
+        "winPosWidthRatio":0.13,
+        "winPosHeightRatio":0.1,
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
     
         "win_pos":[150,110]},
         
@@ -58,6 +70,12 @@
 
         "vertice":"center",
         "surface_to_draw_on":"playeroverlay",
+
+        
+        "winPosWidthRatio":0.9,
+        "winPosHeightRatio":0.7,
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
     
         "win_pos":[1100,600]},
 
@@ -80,6 +98,11 @@
 
         "vertice":"center",
         "surface_to_draw_on":"playeroverlay",
+
+        "winPosWidthRatio":0.9,
+        "winPosHeightRatio":0.8,
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
     
         "win_pos":[1100,700]},
 
@@ -102,6 +125,12 @@
 
         "vertice":"center",
         "text_colour":"white",
+
+        
+        "winPosWidthRatio":0.05,
+        "winPosHeightRatio":0.8,
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
     
         "win_pos":[50,700]},
 
@@ -123,6 +152,11 @@
         "surface_to_draw_on":"playeroverlay",
 
         "vertice":"topleft",
+
+        "winPosWidthRatio":0.05,
+        "winPosHeightRatio":0.1,
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
     
         "win_pos":[50,100]},
 
@@ -183,6 +217,11 @@
 
         "vertice":"center",
         "ignoreCameraOffset":true,
+
+        "winPosWidthRatio":0.5,
+        "winPosHeightRatio":0.25,
+        "winPosWidthOffsetRatio":0.5,
+        "winPosHeightOffsetRatio":0.5,
     
         "win_pos":[0,-50]},
 
@@ -205,6 +244,12 @@
 
         "vertice":"center",
         "ignoreCameraOffset":true,
+
+        
+        "winPosWidthRatio":0.5,
+        "winPosHeightRatio":0.75,
+        "winPosWidthOffsetRatio":0.5,
+        "winPosHeightOffsetRatio":0.5,
     
         "win_pos":[0,150]},
 
@@ -227,7 +272,11 @@
         "text_colour":"white",
 
         "vertice":"center",
-    
+        
+        "winPosWidthRatio":0.5,
+        "winPosHeightRatio":0.25,
+        "winPosWidthOffsetRatio":0.5,
+        "winPosHeightOffsetRatio":0.5,
         "win_pos":[0,-50]},
 
     "PauseQuitHUD":{
@@ -248,6 +297,11 @@
         "text_colour":"white",
 
         "vertice":"center",
+
+        "winPosWidthRatio":0.5,
+        "winPosHeightRatio":0.75,
+        "winPosWidthOffsetRatio":0.5,
+        "winPosHeightOffsetRatio":0.5,
     
         "win_pos":[0,150]}
 }
