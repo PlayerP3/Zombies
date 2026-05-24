@@ -197,7 +197,10 @@ class Raycast():
                        animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,
                        zlayer:int=0,alpha:int=100,ignore_offset:bool=False):
 
-        pos_rect = gameScreen.windows['win'].win.get_frect(center=position)
+        # pos_rect = gameScreen.windows['win'].win.get_frect(center=position)
+
+        # pos_rect = self.sprite.get_frect(center=position)#
+        position = (position[0] - (gameScreen.windows['win'].win.get_width()/gameScreen.windows['fog_of_war'].zoom)//2,position[1] - (gameScreen.windows['win'].win.get_height()//gameScreen.windows['fog_of_war'].zoom)//2)
 
         random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
 
@@ -210,7 +213,7 @@ class Raycast():
                                         'animation_length':animation_length,
                                         'animation_timer':animation_length,
                                         'position':position,
-                                        'position_rect':pos_rect,
+                                        'position_rect':None,
                                         'value':value,
                                         'is_critical':is_critical,
                                         'sin_waveY':math.radians(90),
@@ -228,7 +231,10 @@ class Raycast():
                        animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,
                        zlayer:int=2,alpha:int=100,ignore_offset:bool=False):
 
-        pos_rect = gameScreen.windows['fog_of_war'].win.get_frect(center=position)
+        # pos_rect = gameScreen.windows['fog_of_war'].win.get_frect(center=position)
+
+        position = (position[0] - (gameScreen.windows['fog_of_war'].win.get_width()/gameScreen.windows['win'].zoom)//2,position[1] - (gameScreen.windows['fog_of_war'].win.get_height()//gameScreen.windows['win'].zoom)//2)
+
 
         random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
 
@@ -241,7 +247,7 @@ class Raycast():
                                         'animation_length':animation_length,
                                         'animation_timer':animation_length,
                                         'position':position,
-                                        'position_rect':pos_rect,
+                                        'position_rect':None,
                                         'value':value,
                                         'is_critical':is_critical,
                                         'sin_waveY':math.radians(90),
@@ -258,7 +264,10 @@ class Raycast():
                     animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,endpoints:list=[],
                     zlayer:int=1,alpha:int=255,ignore_offset:bool=False):
 
-        pos_rect = gameScreen.windows['win'].win.get_frect(center=position)
+        # pos_rect = gameScreen.windows['win'].win.get_frect(center=position)
+
+        position = (position[0] - (gameScreen.windows['fog_of_war'].win.get_width()/gameScreen.windows['win'].zoom)//2,position[1] - (gameScreen.windows['fog_of_war'].win.get_height()//gameScreen.windows['win'].zoom)//2)
+
 
         random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
 
@@ -271,7 +280,7 @@ class Raycast():
                                         'animation_length':animation_length,
                                         'animation_timer':animation_length,
                                         'position':position,
-                                        'position_rect':pos_rect,
+                                        'position_rect':None,
                                         'value':value,
                                         'is_critical':is_critical,
                                         'sin_waveY':math.radians(90),

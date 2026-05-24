@@ -18,11 +18,11 @@ core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUI
 
 core.screenManager.add_window('wincopy',1280,720,(core.screenManager.fullscreen_width//2,core.screenManager.fullscreen_height//2))
 core.screenManager.add_window('fog_of_war',1280,720,(core.screenManager.fullscreen_width//2,core.screenManager.fullscreen_height//2))
-core.screenManager.add_window('HUD',1280,720,(core.screenManager.fullscreen_width//2,core.screenManager.fullscreen_height//2))
+core.screenManager.add_window('playeroverlay',1280,720,(core.screenManager.fullscreen_width//2,core.screenManager.fullscreen_height//2))
 core.screenManager.add_window('win',1280,720,(core.screenManager.fullscreen_width//2,core.screenManager.fullscreen_height//2))
-core.screenManager.windows['win'].zoom = 1
-core.screenManager.windows['wincopy'].zoom = 1
-core.screenManager.windows['fog_of_war'].zoom = 1
+core.screenManager.windows['win'].zoom = 1.4
+core.screenManager.windows['wincopy'].zoom = 1.4
+core.screenManager.windows['fog_of_war'].zoom = 1.4
 
 import cProfile
 import pstats
