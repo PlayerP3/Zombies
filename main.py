@@ -1,33 +1,31 @@
 
 import pygame,random,json,os,sys
-import engine.pynaccle as Pyn
+
+# set working dir to current game
+os.chdir(os.path.dirname(__file__))
+
+# add path to
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
+
+import pynaccle.engine as Pyn
 from States.Game.splash import Splash
 from States.Game.paused import Paused
 # from States.Game import gameover
 from States.Game.gameplay import Gameplay
 from States.Game.quit import Quit
 from wallbuy import Wallbuy
-from engine.animatedsprite import AnimatedSprite
-from bgtile import BgTile
+from pynaccle.animatedsprite import AnimatedSprite
 from door import Door
 from wall import Wall
 
 # init engine
-core = Pyn.Pynaccle()
+core = Pyn.Engine()
+
+print(os.path.dirname(__file__))
 
 core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()},
-          tilemapJSON='chunk1.json',
+          tilemapJSON="tilemaps/chunk1.json",
           classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall})
-
-# add screens
-
-core.screenManager.add_window('wincopy',1280,720,(core.screenManager.fullscreen_width//2,core.screenManager.fullscreen_height//2))
-core.screenManager.add_window('fog_of_war',1280,720,(core.screenManager.fullscreen_width//2,core.screenManager.fullscreen_height//2))
-core.screenManager.add_window('playeroverlay',1280,720,(core.screenManager.fullscreen_width//2,core.screenManager.fullscreen_height//2))
-core.screenManager.add_window('win',1280,720,(core.screenManager.fullscreen_width//2,core.screenManager.fullscreen_height//2))
-core.screenManager.windows['win'].zoom = 1
-core.screenManager.windows['wincopy'].zoom = 1
-core.screenManager.windows['fog_of_war'].zoom = 1
 
 for bbj in core.objectManager.active_pool:
     bbj.init()
@@ -36,20 +34,21 @@ for bbj in core.objectManager.active_pool:
         bbj.spawnL()
     
     
+    
 
 import cProfile
 import pstats
-import interactable
+import pynaccle.interactable
 from roundtracker import round_manager
 from player import Player
 from item import Item
-import enemy
-import engine.moveableobject
-from engine.hud import HUD_element
-from engine.objectsystem import objectManager
+from pynaccle.enemy import Enemy
+import pynaccle.moveableobject
+from pynaccle.hud import HUD_element
+from pynaccle.objectsystem import objectManager
 import wallbuy
 from wall import *
-from pathfinding import Pathfinding,build_astar_graph,build_true_clearance_graph
+from pynaccle.pathfinding import Pathfinding,build_astar_graph,build_true_clearance_graph
 
 
 
@@ -57,13 +56,14 @@ from pathfinding import Pathfinding,build_astar_graph,build_true_clearance_graph
 random.seed()
 
 # load files in
-with open('config_player.json','r') as player_attributes_file, open('config_hud_elements.json','r') as hudelements_attributes_file:
+with open('configs/config_player.json','r') as player_attributes_file, open('configs/config_hud_elements.json','r') as hudelements_attributes_file:
 
     player_parameters = json.load(player_attributes_file)
     hudelements_parameters = json.load(hudelements_attributes_file)
 
 
-
+# add enemies to inactive pool
+objectManager.inactive_pool["Enemy"] = [Enemy() for _ in range(500)]
 
 # player
 player = Player()
@@ -170,13 +170,13 @@ def run():
      
     # now that everything is loaded enter roun start state
     round_manager.state.enter()
-    # round_manager.connected_hud = [x for x in engine.hud.hud_elements['RoundNumber'] if x.name == 'RoundNumberHUD'][0]
+    # round_manager.connected_hud = [x for x in pynaccle.hud.hud_elements['RoundNumber'] if x.name == 'RoundNumberHUD'][0]
 
     
 
     # add objs to active pool
     core.objectManager.active_pool.append(player)
-    # engine.active_pool.append(player.weapon)
+    # pynaccle.active_pool.append(player.weapon)
     core.objectManager.active_pool.append(round_manager)
     
     

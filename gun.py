@@ -1,24 +1,18 @@
 import pygame,random,json,os,math,sys
 from pygame.math import Vector2
-from engine.moveableobject import Moveable_Object
-from weapon import *
-from engine.utils import *
-from engine.statemachine import StateMachine
-from engine.objectsystem import objectManager
+from pynaccle.moveableobject import Moveable_Object
+from pynaccle.weapon import *
+from pynaccle.utils import *
+from pynaccle.statemachine import StateMachine
+from pynaccle.objectsystem import objectManager
 from States.Gun.idle import Idle
 from States.Gun.reloading import Reloading
 from States.Gun.shooting import Shooting
 from States.Gun.pickup import Pickup
 from States.Gun.pullout import Pullout
 
-
 # load files in
-with open('config_suits_and_ranks.json','r') as suit_rank_attributes_file:
-
-    suit_rank_weight_parameters = json.load(suit_rank_attributes_file)
-
-# load files in
-with open('config_gun.json','r') as gun_attributes_file:
+with open(os.path.join(os.path.dirname(__file__),'configs/config_gun.json'),'r') as gun_attributes_file:
 
     gun_parameters = json.load(gun_attributes_file)
 

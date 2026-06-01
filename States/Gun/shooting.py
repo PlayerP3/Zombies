@@ -1,8 +1,8 @@
 import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
-from engine.objectsystem import objectManager
+from pynaccle.statemachine import State
+from pynaccle.objectsystem import objectManager
 import sys
 
 class Shooting(State):

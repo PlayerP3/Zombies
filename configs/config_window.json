@@ -1,0 +1,29 @@
+{
+    "wincopy":
+        {
+            "width":1280,
+            "height":720,
+            "zoom":2
+        },
+
+    "fog_of_war":
+        {
+            "width":1280,
+            "height":720,
+            "zoom":2
+        },
+
+    "playeroverlay":
+        {
+            "width":1280,
+            "height":720,
+            "zoom":1.5
+        },
+
+    "win":
+        {
+            "width":1280,
+            "height":720,
+            "zoom":2
+        }
+}

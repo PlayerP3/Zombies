@@ -1,7 +1,7 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
+from pynaccle.statemachine import State
 
 
 class Idle(State):
@@ -72,7 +72,7 @@ class Idle(State):
                 self.parent_node.movementy[1] = 1   
 
             # if event.key == pygame.K_RETURN:
-            #     engine.display_tiles *= -1
+            #     pynaccle.display_tiles *= -1
 
             if event.key == pygame.K_e:
                 self.parent_node.is_interacting = True
@@ -81,7 +81,7 @@ class Idle(State):
                 self.parent_node.swap_weapon()
 
             # if event.key == pygame.K_m:
-            #     engine.camera.change_focus = True
+            #     pynaccle.camera.change_focus = True
     
         if event.type == pygame.KEYUP:
 

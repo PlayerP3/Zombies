@@ -1,7 +1,7 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
+from pynaccle.statemachine import State
 
 pass
 
@@ -32,13 +32,15 @@ class Gameplay(State):
         self.submit_event_processing()
 
         # fill window
-        self.parent_node.screenManager.windows['win'].win.fill((200,0,0))
+        self.parent_node.screenManager.windows['win'].win.fill((0,0,0))
         # self.parent_node.screenManager.windows['win'].win.blit(self.parent_node.screenManager.windows['Chunk1'].win,(0,0))
-        self.parent_node.screenManager.windows['win'].draw_surface(self.parent_node.screenManager.windows['Chunk1'].win)
+
+        print(1707/4)
+        self.parent_node.screenManager.windows['win'].draw_surface(self.parent_node.screenManager.windows['Chunk1'].win,position=(-480,-620))
 
         # self.parent_node.screenManager.windows['win'].win_copy = self.parent_node.screenManager.windows['win']
 
-        # engine.camera.track_position(window=engine.windows.win)
+        # pynaccle.camera.track_position(window=pynaccle.windows.win)
         self.parent_node.screenManager.windows['win'].focus = self.parent_node.objectManager.player.hurtbox.center
         self.parent_node.screenManager.windows['win'].track_object_spring()
         self.parent_node.screenManager.windows['fog_of_war'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x

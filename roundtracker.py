@@ -1,8 +1,8 @@
-import pygame,math,random,json
-from engine.timer import Timer
-from engine.utils import *
-from engine.statemachine import StateMachine
-from engine.objectsystem import objectManager
+import pygame,math,random,json,os
+from pynaccle.timer import Timer
+from pynaccle.utils import *
+from pynaccle.statemachine import StateMachine
+from pynaccle.objectsystem import objectManager
 from States.RoundTracker.bossfight import BossFight
 from States.RoundTracker.easteregg import EasterEgg
 from States.RoundTracker.roundinprogress import RoundInProgress
@@ -10,12 +10,9 @@ from States.RoundTracker.roundend import RoundEnd
 from States.RoundTracker.roundstart import RoundStart
 pygame.font.init()
 
-with open('config_roundtracker.json','r') as roundtracker_attributes_file:
-
-    roundtracker_parameters = json.load(roundtracker_attributes_file)
 
 # load in parameters
-with open('config_enemy.json','r') as enemy_attributes_file:
+with open(os.path.join(os.path.dirname(__file__),'configs','config_enemy.json'),'r') as enemy_attributes_file:
 
     enemy_parameters = json.load(enemy_attributes_file)
 

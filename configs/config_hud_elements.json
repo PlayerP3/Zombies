@@ -1,0 +1,307 @@
+{
+    "CurrentHealthHUD":{
+        "zlayer_drawing":6,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":23,
+        "hurtbox_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/HealthBars/HealthBarFull.png",
+        "img_width":32,
+        "img_height":4,
+        "img_width_scale":5,
+        "img_height_scale":5,
+
+        "vertice":"topleft",
+        "surface_to_draw_on":"playeroverlay",
+
+        "winPosWidthRatio":0.05,
+        "winPosHeightRatio":0.1,
+
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
+
+    
+        "win_pos":[50,100]},
+
+    "CurrentHealthTextHUD":{
+        "zlayer_drawing":7,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":23,
+        "hurtbox_height":36,
+        "name":"CurrentHealthTextHUD",
+
+        "img_path":"0",
+        "img_width":10,
+        "img_height":23,
+        "img_width_scale":1,
+        "img_height_scale":1,
+
+        "is_text":true,
+        "surface_to_draw_on":"playeroverlay",
+
+        "vertice":"center",
+
+        "winPosWidthRatio":0.11,
+        "winPosHeightRatio":0.11,
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
+    
+        "win_pos":[150,110]},
+        
+    "AmmoTextHUD":{
+        "zlayer_drawing":7,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":23,
+        "hurtbox_height":36,
+        "name":"CurrentHealthTextHUD",
+
+        "img_path":"0",
+        "img_width":10,
+        "img_height":23,
+        "img_width_scale":1,
+        "img_height_scale":1,
+
+        "is_text":true,
+        "text_colour":"white",
+
+        "vertice":"center",
+        "surface_to_draw_on":"playeroverlay",
+
+        
+        "winPosWidthRatio":0.9,
+        "winPosHeightRatio":0.7,
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
+    
+        "win_pos":[1100,600]},
+
+    "PointsHUD":{
+        "zlayer_drawing":7,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":23,
+        "hurtbox_height":36,
+        "name":"CurrentHealthTextHUD",
+
+        "img_path":"0",
+        "img_width":10,
+        "img_height":23,
+        "img_width_scale":1,
+        "img_height_scale":1,
+
+        "is_text":true,
+        "text_colour":"white",
+
+        "vertice":"center",
+        "surface_to_draw_on":"playeroverlay",
+
+        "winPosWidthRatio":0.9,
+        "winPosHeightRatio":0.8,
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
+    
+        "win_pos":[1100,700]},
+
+    "RoundNumberHUD":{
+        "zlayer_drawing":7,
+        "rect_colour":"blue",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":23,
+        "hurtbox_height":36,
+        "name":"RoundNumberHUD",
+
+        "img_path":"0",
+        "img_width":10,
+        "img_height":23,
+        "img_width_scale":1,
+        "img_height_scale":1,
+        "surface_to_draw_on":"playeroverlay",
+
+        "is_text":true,
+
+        "vertice":"center",
+        "text_colour":"white",
+
+        
+        "winPosWidthRatio":0.05,
+        "winPosHeightRatio":0.8,
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
+    
+        "win_pos":[50,700]},
+
+
+    
+    "EmptyHealthHUD":{
+        "zlayer_drawing":5,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":23,
+        "hurtbox_height":36,
+        "name":"EmptyHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/HealthBars/HealthBarEmpty.png",
+        "img_width":32,
+        "img_height":4,
+        "img_width_scale":5,
+        "img_height_scale":5,
+        "surface_to_draw_on":"playeroverlay",
+
+        "vertice":"topleft",
+
+        "winPosWidthRatio":0.05,
+        "winPosHeightRatio":0.1,
+        "winPosWidthOffsetRatio":0,
+        "winPosHeightOffsetRatio":0,
+    
+        "win_pos":[50,100]},
+
+
+    "CurrentCardHUD":{
+        "zlayer_drawing":6,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":23,
+        "hurtbox_height":36,
+        "name":"EmptyHealthHUD",
+
+        "img_path":"Sprites/Cards/Hearts/A.png",
+        "img_width":23,
+        "img_height":36,
+        "img_width_scale":4,
+        "img_height_scale":4,
+
+        "vertice":"center",
+    
+        "win_pos":[352,160]},
+
+
+    "DefaultCardHUD":{
+        "zlayer_drawing":5,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":23,
+        "hurtbox_height":36,
+        "name":"EmptyHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/PokerCards/Default.png",
+        "img_width":23,
+        "img_height":36,
+        "img_width_scale":4,
+        "img_height_scale":4,
+
+        "vertice":"center",
+    
+        "win_pos":[352,160]},
+
+    "SplashStartHUD":{
+        "zlayer_drawing":7,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":100,
+        "hurtbox_height":100,
+        "name":"SplashStartHUD",
+
+        "img_path":"START",
+        "img_width":10,
+        "img_height":23,
+        "img_width_scale":1,
+        "img_height_scale":1,
+
+        "is_text":true,
+        "text_colour":"white",
+
+        "vertice":"center",
+        "ignoreCameraOffset":true,
+
+        "winPosWidthRatio":0.5,
+        "winPosHeightRatio":0.25,
+        "winPosWidthOffsetRatio":0.5,
+        "winPosHeightOffsetRatio":0.5,
+    
+        "win_pos":[0,-50]},
+
+    "SplashQuitHUD":{
+        "zlayer_drawing":7,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":100,
+        "hurtbox_height":100,
+        "name":"SplashQuitHUD",
+
+        "img_path":"QUIT",
+        "img_width":10,
+        "img_height":23,
+        "img_width_scale":1,
+        "img_height_scale":1,
+
+        "is_text":true,
+        "text_colour":"white",
+
+        "vertice":"center",
+        "ignoreCameraOffset":true,
+
+        
+        "winPosWidthRatio":0.5,
+        "winPosHeightRatio":0.75,
+        "winPosWidthOffsetRatio":0.5,
+        "winPosHeightOffsetRatio":0.5,
+    
+        "win_pos":[0,150]},
+
+    
+    "PauseResumeHUD":{
+        "zlayer_drawing":7,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":100,
+        "hurtbox_height":100,
+        "name":"PauseResumeHUD",
+
+        "img_path":"RESUME",
+        "img_width":10,
+        "img_height":23,
+        "img_width_scale":1,
+        "img_height_scale":1,
+
+        "is_text":true,
+        "text_colour":"white",
+
+        "vertice":"center",
+        
+        "winPosWidthRatio":0.5,
+        "winPosHeightRatio":0.25,
+        "winPosWidthOffsetRatio":0.5,
+        "winPosHeightOffsetRatio":0.5,
+        "win_pos":[0,-50]},
+
+    "PauseQuitHUD":{
+        "zlayer_drawing":7,
+        "rect_colour":"red",
+        "object_of_origin":"HUD_Element",
+        "hurtbox_width":100,
+        "hurtbox_height":100,
+        "name":"PauseQuitHUD",
+
+        "img_path":"QUIT",
+        "img_width":10,
+        "img_height":23,
+        "img_width_scale":1,
+        "img_height_scale":1,
+
+        "is_text":true,
+        "text_colour":"white",
+
+        "vertice":"center",
+
+        "winPosWidthRatio":0.5,
+        "winPosHeightRatio":0.75,
+        "winPosWidthOffsetRatio":0.5,
+        "winPosHeightOffsetRatio":0.5,
+    
+        "win_pos":[0,150]}
+}

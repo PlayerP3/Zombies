@@ -1,20 +1,20 @@
-from engine.utils import *
+from pynaccle.utils import *
 import json
-from engine.moveableobject import Moveable_Object
-from interactable import Interactable,Idle,Interacting
+from pynaccle.moveableobject import Moveable_Object
+from pynaccle.interactable import Interactable,Idle,Interacting
+from wall import Wall
+import sys
 
-# load in parameters
-with open('config_wallbuy.json','r') as wallbuy_attributes_file:
-
-    wallbuy_parameters = json.load(wallbuy_attributes_file)
-
-
-class Door(Interactable):
+class Door(Interactable,Wall):
 
     def __init__(self):
 
+        self.hitbox = pygame.FRect(0,0,100,100)
 
+        Wall.__init__(self)
         Interactable.__init__(self)
+        
+        
      
 
     def init(self):
@@ -43,7 +43,32 @@ class Door(Interactable):
             # remove from game tiles
 
 
+    # handle collision once the check is confirmed
+    def handle_collision(self,game_object:object,axis:str):
 
+        # if inactive dont bother running code        
+        if not self.is_active:
+            return
+
+        if game_object.object_of_origin == 'Player':
+
+            if game_object.__class__.__name__ == 'Player':
+                    
+                # display message
+                self.display_message.draw_surface(position=(self.hurtbox.topright[0]+3,self.hurtbox.topright[1]-3))
+
+                # if player is interacting
+                if game_object.is_interacting:
+                    self.state.emit('INTERACTING')
+
+                # if player is interacting
+                elif not game_object.is_interacting:
+                    self.state.emit('IDLE')
+
+    def update_data(self):
+
+        self.update_position()
+        self.hitbox.center = self.hurtbox.center
 
 # for wb in wallbuy_parameters:
 
@@ -55,6 +80,7 @@ class Door(Interactable):
 
 #     wbobj.spawn(pos=wallbuy_parameters[wb]['pos'])
 
-#     engine.active_pool.append(wbobj)
+#     pynaccle.active_pool.append(wbobj)
 
 
+print(Door.__mro__)

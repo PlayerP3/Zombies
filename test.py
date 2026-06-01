@@ -128,5 +128,5 @@ print(x.original_vars)
 
 x = {'class':'Wall'}
 
-import engine.pens as p
+import pynaccle.pens as p
 print(p.penHolder)
