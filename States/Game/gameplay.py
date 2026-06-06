@@ -2,6 +2,7 @@ import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
 from pynaccle.statemachine import State
+from pynaccle.tilemap import tilemapProcessor
 
 pass
 
@@ -35,8 +36,13 @@ class Gameplay(State):
         self.parent_node.screenManager.windows['win'].win.fill((0,0,0))
         # self.parent_node.screenManager.windows['win'].win.blit(self.parent_node.screenManager.windows['Chunk1'].win,(0,0))
 
-        print(1707/4)
-        self.parent_node.screenManager.windows['win'].draw_surface(self.parent_node.screenManager.windows['Chunk1'].win,position=(-480,-620))
+        # self.parent_node.screenManager.windows['win'].draw_surface(self.parent_node.screenManager.windows['Chunk1'].win,position=(-320,-180))
+
+        # draw chunks
+        for chunk in tilemapProcessor.openChunks:
+            self.parent_node.screenManager.windows['win'].draw_tilemap(self.parent_node.screenManager.windows[f'chunk{chunk}'].win,position=(-self.parent_node.screenManager.windows[f'chunk{chunk}'].win_width//2,-self.parent_node.screenManager.windows[f'chunk{chunk}'].win_height//2))
+        
+        # self.parent_node.screenManager.windows['win'].win.blit(self.parent_node.screenManager.windows['Chunk1'].win,(640-1600,360-1600))
 
         # self.parent_node.screenManager.windows['win'].win_copy = self.parent_node.screenManager.windows['win']
 
@@ -57,14 +63,18 @@ class Gameplay(State):
         # display hud
         self.parent_node.overlay.display_hud()
 
+        # draw player overlay
+        self.parent_node.screenManager.windows['win'].draw_overlay(self.parent_node.screenManager.windows['playeroverlay'].win,ignoreCameraOffset=True,zlayer=7)
+
         # self.parent_node.display_game_tiles()
 
         # draw all objects onto the window
         self.parent_node.screenManager.render_windows()
-        self.parent_node.screenManager.windows['win'].win.blit(self.parent_node.screenManager.windows['playeroverlay'].win,(0,0))
 
         # scale the window, and blit to display
         pygame.transform.scale(self.parent_node.screenManager.windows['win'].win,(self.parent_node.screenManager.fullscreen_width,self.parent_node.screenManager.fullscreen_height),self.parent_node.screenManager.screen)
+        # pygame.transform.scale(self.parent_node.screenManager.windows['Chunk1'].win,(self.parent_node.screenManager.fullscreen_width,self.parent_node.screenManager.fullscreen_height),self.parent_node.screenManager.screen)
+
 
         # update display
         pygame.display.flip()

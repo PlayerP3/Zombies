@@ -43,18 +43,18 @@ class Pickup(State):
 
             if event.button == pygame.BUTTON_LEFT:
                 # handle left clicks differently for semi auto and full aout weapons
-                if self.parent_node.select_fire == 'fullauto':
+               
 
-                    # only allow shoointg if there are ammo reserrves or ammo in the current magazine
-                    if (self.parent_node.total_ammo_stock > 0 or self.parent_node.bullets_remaining_in_mag > 0):#and not player_bullet_manager.is_reloading, this prevents shooting if theyre using auto weapons and try to hold shoot whilskt reloading
+                # only allow shoointg if there are ammo reserrves or ammo in the current magazine
+                if (self.parent_node.total_ammo_stock > 0 or self.parent_node.bullets_remaining_in_mag > 0):#and not player_bullet_manager.is_reloading, this prevents shooting if theyre using auto weapons and try to hold shoot whilskt reloading
 
-                        # if the gun is not a dual wiled weapon set the regular shooting to true
-                        if not self.parent_node.is_dual_wield:
+                    # if the gun is not a dual wiled weapon set the regular shooting to true
+                    if not self.parent_node.is_dual_wield:
 
-                            # set shooting to be true
-                            # self.emit('SHOOTING')
-                            # set shooting to be true
-                            self.parent_node.is_shooting = True
+                        # set shooting to be true
+                        # self.emit('SHOOTING')
+                        # set shooting to be true
+                        self.parent_node.is_shooting = True
 
                     
 
