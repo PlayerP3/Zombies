@@ -4,12 +4,16 @@ from pynaccle.moveableobject import Moveable_Object
 from pynaccle.interactable import Interactable,Idle,Interacting
 from wall import Wall
 import sys
+from pynaccle.tilemap import tilemapProcessor
+from pynaccle.objectsystem import objectManager
 
 class Door(Interactable,Wall):
 
-    def __init__(self):
+    def __init__(self,connectedChunk:int=0):
 
         self.hitbox = pygame.FRect(0,0,100,100)
+
+        self.connectedChunk = connectedChunk
 
         Wall.__init__(self)
         Interactable.__init__(self)
@@ -40,7 +44,8 @@ class Door(Interactable,Wall):
             # set to inactive
             self.is_active = False
 
-            # remove from game tiles
+            objectManager.add_chunk(self.connectedChunk)
+           
 
 
     # handle collision once the check is confirmed
@@ -83,4 +88,4 @@ class Door(Interactable,Wall):
 #     pynaccle.active_pool.append(wbobj)
 
 
-print(Door.__mro__)
+# print(Door.__mro__)

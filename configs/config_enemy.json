@@ -8,8 +8,8 @@
             "name":"Default",
 
             "img_path":"Sprites/Cards/Hearts/9.png",
-            "img_width":23,
-            "img_height":36,
+            "spriteWidth":23,
+            "spriteHeight":36,
             "hurtbox_width":13,
             "hurtbox_height":20,
             "sprite_offsety":-8,

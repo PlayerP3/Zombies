@@ -10,6 +10,8 @@ from States.Gun.reloading import Reloading
 from States.Gun.shooting import Shooting
 from States.Gun.pickup import Pickup
 from States.Gun.pullout import Pullout
+# from States.Gun.racking import Racking
+from States.Gun.tbns import Tbns
 
 # load files in
 with open(os.path.join(os.path.dirname(__file__),'configs/config_gun.json'),'r') as gun_attributes_file:
@@ -44,9 +46,9 @@ class GunStateMachine(StateMachine):
         if self.state.done:
             
             self.transition_to_next_state()
+            # print(self.state.__class__.__name__)
 
-
-
+        
         self.state.update()
 
 # different decks
@@ -67,10 +69,14 @@ class Gun(Weapon,GunStateMachine):
                        'RELOADING':Reloading(),
                        'SHOOTING':Shooting(),
                        'PICKUP':Pickup(),
-                       'PULLOUT':Pullout()}
+                       'PULLOUT':Pullout(),
+                       'TBNS':Tbns()}
         
         # set pullout time
         self.states['PULLOUT'].timer_limit = self.pullout_time
+
+        # set tbns time
+        self.states['TBNS'].timer_limit = self.triggerResetSpeed
 
         # set parent node for states 
         for x in self.states:

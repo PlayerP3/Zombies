@@ -9,8 +9,8 @@
     "money":1000,
 
     "img_path":"Sprites/Cards/Hearts/A.png",
-    "img_width":23,
-    "img_height":36,
+    "spriteWidth":23,
+    "spriteHeight":36,
 
     "health":10,
     "acceleration":1,

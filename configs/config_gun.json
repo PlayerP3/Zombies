@@ -7,26 +7,25 @@
         "casted_rays":3,
         "raycast_depth":300,
         "raycast_width":60,
-        "fire_rate":7,
+        "fire_rate":18,
         "reload_speed":2,
         "pullout_time":2,
+        "triggerResetSpeed":0,
 
         "projectile_attributes":{
             "Bullet":{
 
-                "img_width":23,
-                "img_height":36,
+                "spriteWidth":23,
+                "spriteHeight":36,
                 "hurtbox_width":32,
                 "hurtbox_height":32,
-                "speed":200,
+                "speed":300,
                 "sine_movement_amplitude":1,
-                "img_width_scale":1,
-                "img_height_scale":1,
                 "object_of_origin":"Player",
                 "movement_type":"normal",
-                "timer_limit":200,
+                "travelTimeTimeLimit":2,
                 "rotation_speed":0,
-                "damage":50,
+                "damage":80,
                 "zlayer_drawing":-1
                 }
         
@@ -37,31 +36,64 @@
     "Pistol":
 
         {
-        "magazine_size":12,
+        "magazine_size":8,
         "total_ammo_stock":48,
         "casted_rays":3,
         "raycast_depth":300,
         "raycast_width":60,
-        "fire_rate":7,
+        "fire_rate":12,
         "reload_speed":2,
         "pullout_time":1,
+        "select_fire":"semiauto",
+        "triggerResetSpeed":0.13,
 
         "projectile_attributes":{
             "Bullet":{
 
-                "img_width":23,
-                "img_height":36,
+                "spriteWidth":23,
+                "spriteHeight":36,
                 "hurtbox_width":32,
                 "hurtbox_height":32,
                 "speed":200,
                 "sine_movement_amplitude":1,
-                "img_width_scale":1,
-                "img_height_scale":1,
                 "object_of_origin":"Player",
                 "movement_type":"normal",
-                "timer_limit":200,
+                "travelTimeTimeLimit":1,
                 "rotation_speed":0,
                 "damage":50,
+                "zlayer_drawing":-1
+                    }
+                                  }    
+            },
+
+
+    "PumpAction":
+
+        {
+        "magazine_size":2,
+        "total_ammo_stock":16,
+        "casted_rays":3,
+        "raycast_depth":100,
+        "raycast_width":60,
+        "fire_rate":12,
+        "reload_speed":2,
+        "pullout_time":1,
+        "select_fire":"pumpaction",
+        "triggerResetSpeed":0.4,
+
+        "projectile_attributes":{
+            "Bullet":{
+
+                "spriteWidth":23,
+                "spriteHeight":36,
+                "hurtbox_width":32,
+                "hurtbox_height":32,
+                "speed":500,
+                "sine_movement_amplitude":1,
+                "object_of_origin":"Player",
+                "travelTimeTimeLimit":0.5,
+                "rotation_speed":0,
+                "damage":100,
                 "zlayer_drawing":-1
                 }
         

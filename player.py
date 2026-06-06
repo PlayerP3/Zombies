@@ -52,7 +52,7 @@ class Player(Moveable_Object,PlayerStateMachine):
         self.mouse_pos = (0,0)
 
         # starting weapon
-        self.starting_weapon = 'AssaultRifle'
+        self.starting_weapon = 'Pistol'
 
         # current weapon
         self.weapon = guns[self.starting_weapon]

@@ -24,7 +24,6 @@ core = Pyn.Engine()
 print(os.path.dirname(__file__))
 
 core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()},
-          tilemapJSON="tilemaps/chunk1.json",
           classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall})
 
 for bbj in core.objectManager.active_pool:
@@ -73,7 +72,7 @@ core.objectManager.player.spawn((0,0))
 
 def update_health_hud(hud_element:HUD_element):
 
-    hud_element.img_width_scale = (core.objectManager.player.health*hud_element.original_vars['img_width_scale'])/core.objectManager.player.total_health
+    hud_element.spriteWidthScale = (core.objectManager.player.health*hud_element.original_vars['spriteWidthScale'])/core.objectManager.player.total_health
 
 def update_health_text_hud(hud_element:HUD_element):
 
