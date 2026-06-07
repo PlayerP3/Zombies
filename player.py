@@ -1,13 +1,14 @@
-import pygame,os,re
+import pygame,os,re,sys
 from pygame.math import Vector2
 from gun import guns
-from engine.statemachine import StateMachine
+from pynaccle.statemachine import StateMachine
 from States.Player.idle import Idle
 from States.Player.walking import Walking
 from States.Player.running import Running
-from engine.moveableobject import Moveable_Object
-from engine.utils import *
-from engine.screen import gameScreen
+from pynaccle.moveableobject import Moveable_Object
+from pynaccle.utils import *
+from pynaccle.screen import gameScreen
+
 pygame.font.init()
 
 ## USEFUL INFO
@@ -51,7 +52,7 @@ class Player(Moveable_Object,PlayerStateMachine):
         self.mouse_pos = (0,0)
 
         # starting weapon
-        self.starting_weapon = 'AssaultRifle'
+        self.starting_weapon = 'Pistol'
 
         # current weapon
         self.weapon = guns[self.starting_weapon]
@@ -113,7 +114,9 @@ class Player(Moveable_Object,PlayerStateMachine):
 
         if game_object.object_of_origin == 'Game':
 
-            if game_object.__class__.__name__ == 'Wall':
+            if game_object.__class__.__name__ in ['Wall','Door']:
+
+                # sys.exit()
 
                 if axis == 'x':
                     if self.movement[0] < 0:

@@ -1,18 +1,12 @@
 import pygame,os,re,sys
 from pygame.math import Vector2
-from engine.utils import *
-from engine.objectsystem import objectManager
+from pynaccle.utils import *
+from pynaccle.objectsystem import objectManager
 import json
 import numpy as np
 from item import Item
 from gun import guns
 # from miscsprites import MiscellaneousMgr
-
-# load in parameters
-with open('config_wallbuy.json','r') as wallbuy_attributes_file:
-
-    wallbuy_parameters = json.load(wallbuy_attributes_file)
-
 
 class Wallbuy(Item):
 

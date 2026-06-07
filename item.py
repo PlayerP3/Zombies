@@ -1,14 +1,14 @@
-
+import os
 from pygame.math import Vector2
-from engine.utils import *
+from pynaccle.utils import *
 import random,json
-from engine.moveableobject import Moveable_Object
-from engine.objectsystem import objectManager
-from interactable import Interactable,Idle,Interacting
+from pynaccle.moveableobject import Moveable_Object
+from pynaccle.objectsystem import objectManager
+from pynaccle.interactable import Interactable,Idle,Interacting
 # from miscsprites import MiscellaneousMgr
 
 # load in parameters
-with open('config_item.json','r') as item_attributes_file:
+with open(os.path.join(os.path.dirname(__file__),'configs/config_item.json'),'r') as item_attributes_file:
 
     item_parameters = json.load(item_attributes_file)
 
@@ -64,18 +64,5 @@ class Item(Interactable):
 # add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
 objectManager.inactive_pool["Item"] = [Item() for _ in range(300)]
 
-# miscobj = objectManager.inactive_pool['Item'][0]
-
-# spawns = [(-48,-48),(-220,-100),(100,220),(500,100)]
-spawns = [(-224,100)]
-
-# set_attributes(game_object=miscobj,attributes=item_parameters['HealthUp'])
-# miscobj.init()
-# store_original_vars(game_object=miscobj)
-
-# miscobj.spawn(random.choice(spawns))
-
-# objectManager.active_pool.append(miscobj)
-# objectManager.inactive_pool['Item'].remove(miscobj)
 
 
