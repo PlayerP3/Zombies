@@ -17,6 +17,9 @@ class Pickup(State):
         # inti timer
         self.timer_init()
 
+        # give max ammo
+        self.parent_node.max_ammo()
+
     def update(self):
 
         # submit event processing
@@ -26,6 +29,7 @@ class Pickup(State):
         self.run_timer()
 
         if self.timer_complete:
+
 
             if self.parent_node.is_shooting:
 

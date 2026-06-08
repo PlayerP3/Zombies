@@ -72,6 +72,11 @@ class Gun(Weapon,GunStateMachine):
         super().init()
 
 
+    def max_ammo(self):
+
+        self.total_ammo_stock = self.original_vars['total_ammo_stock']
+        self.bullets_remaining_in_mag = self.magazine_size
+        
         
 
         

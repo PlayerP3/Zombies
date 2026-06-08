@@ -93,7 +93,7 @@ class Wallbuy(Item):
         # find first element in list which is current weapon
         current_weapon = gameobj.allWeapons[0]
         
-        # find second element in list which is next weapon
+        # set weapon to give to player
         weapon_to_give = self.name
 
         if len(gameobj.allWeapons) < gameobj.weaponCarryLimit:
@@ -102,7 +102,7 @@ class Wallbuy(Item):
             gameobj.allWeapons.insert(0,weapon_to_give)
 
 
-        elif len(gameobj.allWeapons) > gameobj.weaponCarryLimit:
+        elif len(gameobj.allWeapons) >= gameobj.weaponCarryLimit:
 
             # remove current weapon and add to end of list
             gameobj.allWeapons.remove(current_weapon)

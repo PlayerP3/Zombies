@@ -57,8 +57,9 @@ class Gameplay(State):
         self.parent_node.screenManager.windows['playeroverlay'].win.fill((0,0,0,0))
         
 
-        # run game object behaviour
+        # run game object behaviour and bj objects
         self.parent_node.objectManager.update_game_objects()
+        self.parent_node.objectManager.update_background_objects()
 
         # display hud
         self.parent_node.overlay.display_hud()
