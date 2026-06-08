@@ -26,17 +26,13 @@ core = Pyn.Engine()
 print(os.path.dirname(__file__))
 
 core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()},
-          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall})
+          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall},hitboxMetadataJSON='configs/config_hitboxes.json')
 
 # spawn initial bg objects
 for chunk in core.tilemapProcessor.openChunks:
     for gameobj in core.tilemapProcessor.chunkObj[chunk]:
         gameobj.init()
         gameobj.spawn(pos=gameobj.spawnLocation,vertice='center')
-
-        if gameobj.__class__.__name__ == 'Wall':
-
-            print(gameobj.hurtbox.center)
 
         if gameobj.inaccessible:
             core.tilemapProcessor.inaccessible_tiles.append(gameobj.spawnLocation)

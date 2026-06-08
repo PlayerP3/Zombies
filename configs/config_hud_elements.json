@@ -7,7 +7,7 @@
         "hurtbox_height":36,
         "name":"CurrentHealthHUD",
 
-        "img_path":"Sprites/Miscellaneous/HealthBars/HealthBarFull.png",
+        "img_path":"Sprites/Miscellaneous/HealthBars/HealthBarFull_32x4.png",
         "spriteWidth":32,
         "spriteHeight":4,
         "spriteWidthScale":5,
@@ -144,7 +144,7 @@
         "hurtbox_height":36,
         "name":"EmptyHealthHUD",
 
-        "img_path":"Sprites/Miscellaneous/HealthBars/HealthBarEmpty.png",
+        "img_path":"Sprites/Miscellaneous/HealthBars/HealthBarEmpty_32x4.png",
         "spriteWidth":32,
         "spriteHeight":4,
         "spriteWidthScale":5,
@@ -169,7 +169,7 @@
         "hurtbox_height":36,
         "name":"EmptyHealthHUD",
 
-        "img_path":"Sprites/Cards/Hearts/A.png",
+        "img_path":"Sprites/Cards/Hearts/A_23x36.png",
         "spriteWidth":23,
         "spriteHeight":36,
         "spriteWidthScale":4,

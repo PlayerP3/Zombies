@@ -7,7 +7,7 @@
             "object_of_origin":"Enemy",
             "name":"Default",
 
-            "img_path":"Sprites/Cards/Hearts/9.png",
+            "img_path":"/Users/Player3/Desktop/Pynaccle/Games/Zombies/Sprites/Cards/Hearts/9_23x36.png",
             "spriteWidth":23,
             "spriteHeight":36,
             "hurtbox_width":13,

@@ -8,7 +8,7 @@
     "name":"Player",
     "money":10000,
 
-    "img_path":"Sprites/Cards/Hearts/A.png",
+    "img_path":"/Users/Player3/Desktop/Pynaccle/Games/Zombies/Sprites/Cards/Hearts/A_23x36.png",
     "spriteWidth":23,
     "spriteHeight":36,
 
