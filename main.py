@@ -17,6 +17,8 @@ from wallbuy import Wallbuy
 from pynaccle.animatedsprite import AnimatedSprite
 from door import Door
 from wall import Wall
+from spawnpoint import SpawnPoint
+
 
 # init engine
 core = Pyn.Engine()
@@ -26,14 +28,36 @@ print(os.path.dirname(__file__))
 core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()},
           classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall})
 
-for bbj in core.objectManager.active_pool:
-    bbj.init()
+# spawn initial bg objects
+for chunk in core.tilemapProcessor.openChunks:
 
-    if bbj.__class__.__name__ != 'BgTile':
-        bbj.spawnL()
+    for gameobj in core.tilemapProcessor.chunkObj[chunk]:
+
+
+            # newObj.hurtbox_width = 28
+            # newObj.hurtbox_height = 32
+            # newObj.spawnOffsetX = 16
+            # newObj.spawnOffsetY = 32
+            # process_chunks(core=core,chunk=chunk,gameobj=gameobj)
+        gameobj.init()
+        gameobj.spawn(pos=gameobj.spawnLocation,vertice='center')
+
+        
+        
+        # if gameobj.__class__.__name__ == 'Wall':
+        #     print(gameobj.hurtbox.topleft)
+
+        if gameobj.inaccessible:
+            core.tilemapProcessor.inaccessible_tiles.append(gameobj.spawnLocation)
     
-    
-    
+
+# spawn initial objects
+for gameobj in core.objectManager.active_pool:
+    gameobj.init()
+    gameobj.spawn(pos=gameobj.spawnLocation)
+
+    if gameobj.__class__.__name__ == 'Wall':
+        print(gameobj.hurtbox.topleft)
 
 import cProfile
 import pstats
@@ -184,6 +208,8 @@ def run():
     while core.playing:
 
         core.update()
+
+        # print(core.objectManager.object_positions[(-32.0, -128.0)])
 
         # quit_log += 1/60
         # print(quit_log)

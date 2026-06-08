@@ -1,12 +1,12 @@
 {
-    "zlayer_drawing":1,
+    "zlayer_drawing":6,
     "rect_colour":"red",
     "object_of_origin":"Player",
     "hurtbox_width":13,
     "hurtbox_height":20,
     "sprite_offsety":-8,
     "name":"Player",
-    "money":1000,
+    "money":10000,
 
     "img_path":"Sprites/Cards/Hearts/A.png",
     "spriteWidth":23,

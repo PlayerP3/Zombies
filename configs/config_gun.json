@@ -67,12 +67,12 @@
             },
 
 
-    "PumpAction":
+    "Shotgun":
 
         {
         "magazine_size":2,
         "total_ammo_stock":16,
-        "casted_rays":3,
+        "casted_rays":9,
         "raycast_depth":100,
         "raycast_width":60,
         "fire_rate":12,
@@ -80,6 +80,8 @@
         "pullout_time":1,
         "select_fire":"pumpaction",
         "triggerResetSpeed":0.4,
+        "shot_spread_number":5,
+        "shot_spread_pattern":"random",
 
         "projectile_attributes":{
             "Bullet":{
@@ -93,7 +95,7 @@
                 "object_of_origin":"Player",
                 "travelTimeTimeLimit":0.5,
                 "rotation_speed":0,
-                "damage":100,
+                "damage":300,
                 "zlayer_drawing":-1
                 }
         

@@ -6,6 +6,7 @@ from wall import Wall
 import sys
 from pynaccle.tilemap import tilemapProcessor
 from pynaccle.objectsystem import objectManager
+from pynaccle.pathfinding import *
 
 class Door(Interactable,Wall):
 
@@ -44,7 +45,12 @@ class Door(Interactable,Wall):
             # set to inactive
             self.is_active = False
 
-            objectManager.add_chunk(self.connectedChunk)
+            tilemapProcessor.add_chunk("1")
+
+            if self.current_tile_position in tilemapProcessor.inaccessible_tiles:
+                tilemapProcessor.inaccessible_tiles.remove(self.current_tile_position)
+                build_astar_graph()
+                build_true_clearance_graph()
            
 
 

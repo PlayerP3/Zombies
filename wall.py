@@ -71,7 +71,8 @@ class Wall(Moveable_Object):
         # only show the orbital and draw it if it is active
         if self.is_active:
 
-            
+            # print(self.hurtbox.topleft)
+
             # track current tile
             self.update_position()
 
@@ -94,9 +95,10 @@ class Wall(Moveable_Object):
             # self.apply_status_effects()
 
             # draw surface
-            self.draw_surface(position=self.hurtbox.center)
-            self.draw_rect(position=self.hurtbox.center)
-            # self.draw_hitbox(position=self.hitbox.center)
+            self.draw_surface(position=self.spawnLocation)
+            # self.draw_rect(position=self.spawnLocation)
+
+            
 
 
 
