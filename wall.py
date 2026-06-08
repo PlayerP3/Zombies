@@ -96,7 +96,7 @@ class Wall(Moveable_Object):
 
             # draw surface
             self.draw_surface(position=self.spawnLocation)
-            # self.draw_rect(position=self.spawnLocation)
+            self.draw_rect(position=self.spawnLocation)
 
             
 

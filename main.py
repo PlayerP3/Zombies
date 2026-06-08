@@ -30,34 +30,22 @@ core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUI
 
 # spawn initial bg objects
 for chunk in core.tilemapProcessor.openChunks:
-
     for gameobj in core.tilemapProcessor.chunkObj[chunk]:
-
-
-            # newObj.hurtbox_width = 28
-            # newObj.hurtbox_height = 32
-            # newObj.spawnOffsetX = 16
-            # newObj.spawnOffsetY = 32
-            # process_chunks(core=core,chunk=chunk,gameobj=gameobj)
         gameobj.init()
         gameobj.spawn(pos=gameobj.spawnLocation,vertice='center')
 
-        
-        
-        # if gameobj.__class__.__name__ == 'Wall':
-        #     print(gameobj.hurtbox.topleft)
+        if gameobj.__class__.__name__ == 'Wall':
+
+            print(gameobj.hurtbox.center)
 
         if gameobj.inaccessible:
             core.tilemapProcessor.inaccessible_tiles.append(gameobj.spawnLocation)
     
-
 # spawn initial objects
 for gameobj in core.objectManager.active_pool:
     gameobj.init()
     gameobj.spawn(pos=gameobj.spawnLocation)
 
-    if gameobj.__class__.__name__ == 'Wall':
-        print(gameobj.hurtbox.topleft)
 
 import cProfile
 import pstats
@@ -199,7 +187,6 @@ def run():
 
     # add objs to active pool
     core.objectManager.active_pool.append(player)
-    # pynaccle.active_pool.append(player.weapon)
     core.objectManager.active_pool.append(round_manager)
     
     
@@ -209,7 +196,6 @@ def run():
 
         core.update()
 
-        # print(core.objectManager.object_positions[(-32.0, -128.0)])
 
         # quit_log += 1/60
         # print(quit_log)

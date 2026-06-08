@@ -98,7 +98,7 @@ class Gun(Weapon,GunStateMachine):
                     bullet.projectile_manager = self
 
                     # set image path
-                    bullet.img_path = f"Sprites/Cards/Hearts/Back.png"
+                    bullet.img_path = f"Sprites/Cards/Hearts/Back_23x36.png"
 
                     set_attributes(game_object=bullet,attributes=self.projectile_attributes[bullet_object])
 
@@ -165,7 +165,7 @@ class Gun(Weapon,GunStateMachine):
                         bullet.projectile_manager = self
 
                         # set image path
-                        bullet.img_path = f"Sprites/Cards/Hearts/Back.png"
+                        bullet.img_path = f"Sprites/Cards/Hearts/Back_23x36.png"
 
                         set_attributes(game_object=bullet,attributes=self.projectile_attributes[bullet_object])
 
