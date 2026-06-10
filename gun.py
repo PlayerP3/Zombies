@@ -97,9 +97,6 @@ class Gun(Weapon,GunStateMachine):
                     # set projectile manager
                     bullet.projectile_manager = self
 
-                    # set image path
-                    bullet.img_path = f"/Users/Player3/Desktop/Pynaccle/Games/Zombies/Sprites/Cards/Hearts/Back_23x36.png"
-
                     set_attributes(game_object=bullet,attributes=self.projectile_attributes[bullet_object])
 
                     # init the bullet
@@ -163,9 +160,6 @@ class Gun(Weapon,GunStateMachine):
 
                         # set projectile manager
                         bullet.projectile_manager = self
-
-                        # set image path
-                        bullet.img_path = f"/Users/Player3/Desktop/Pynaccle/Games/Zombies/Sprites/Cards/Hearts/Back_23x36.png"
 
                         set_attributes(game_object=bullet,attributes=self.projectile_attributes[bullet_object])
 

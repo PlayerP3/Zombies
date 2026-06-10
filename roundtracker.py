@@ -8,6 +8,10 @@ from States.RoundTracker.easteregg import EasterEgg
 from States.RoundTracker.roundinprogress import RoundInProgress
 from States.RoundTracker.roundend import RoundEnd
 from States.RoundTracker.roundstart import RoundStart
+from pynaccle.tilemap import tilemapProcessor
+from pynaccle.objectsystem import objectManager
+
+
 pygame.font.init()
 
 
@@ -54,7 +58,7 @@ class Round_Tracker(RoundTrackerStateMachine):
         self.round_number = 0
 
         # store spawn locations
-        self.spawnLocations = [(20,96)]
+        self.spawnLocations  = {}
 
         # keeps track of the number of entities that have been spawned since the round started
         self.totalSpawnedInRound = 0
@@ -101,15 +105,28 @@ class Round_Tracker(RoundTrackerStateMachine):
         self.states['ROUNDSTART'].timer_limit = 9
         self.states['ROUNDSTART'].timer_speed = 2
 
+        # get spawn locations for all chunks
+        for chunk in tilemapProcessor.chunkObj:
+
+            self.spawnLocations[chunk] = []
+
+            # get spawn points only
+            spawnPoints = [gobj.spawnLocation for gobj in tilemapProcessor.chunkObj[chunk] if gobj.__class__.__name__ == 'SpawnPoint']
+            self.spawnLocations[chunk].extend(spawnPoints)
+
+
+            # remove dict entry fi theres nothing
+            if not self.spawnLocations[chunk]:
+                del self.spawnLocations[chunk]
+
     # set which eneemies are goign to be allowed to spawn for the round
     def set_enemy_allowed(self):
 
         if self.round_number % 5 == 0:
-
-            self.spawningEnemyTypes = ['Dogs']
+            self.spawningEnemyTypes = ['Enemy']
+            # self.spawningEnemyTypes = ['Dogs']
 
         else:
-
             self.spawningEnemyTypes = ['Enemy']
 
 
@@ -119,6 +136,17 @@ class Round_Tracker(RoundTrackerStateMachine):
         for enemy in self.spawningEnemyTypes:
 
             self.spawners[enemy].update()
+
+    def update_spawn_locations(self):
+
+        # get possible spawns given ope chunk, in future it is those closest to playher as well
+        possibleSpawns = []
+
+        for chunk in tilemapProcessor.openChunks:
+
+            possibleSpawns.extend(self.spawnLocations[chunk])
+
+        return possibleSpawns
 
 class Spawner(Timer):
 
@@ -141,7 +169,7 @@ class Spawner(Timer):
 
             self.totalToSpawn = math.ceil(min(0.09*(self.parent_node.round_number**2 -0.0029) * (self.parent_node.round_number + 23.958),100))
             enemy_parameters[self.enemyType]["health"] = 50 + (100 * self.parent_node.round_number)
-            self.maxAllowedAlive = 1
+            self.maxAllowedAlive = 3
             self.timer_limit = max(2*0.5**(self.parent_node.round_number-1),0.1)
 
 
@@ -183,7 +211,9 @@ class Spawner(Timer):
             set_attributes(game_object=enemy_object,attributes=enemy_parameters['Enemy'])
             enemy_object.init()
             store_original_vars(game_object=enemy_object)
-            enemy_object.spawn(random.choice(self.parent_node.spawnLocations))
+            # enemy_object.spawn(random.choice(self.parent_node.spawnLocations))
+            enemy_object.spawn(random.choice(self.parent_node.update_spawn_locations()))
+
 
             objectManager.active_pool.append(enemy_object)
             objectManager.inactive_pool[self.enemyType].remove(enemy_object)

@@ -26,7 +26,7 @@ core = Pyn.Engine()
 print(os.path.dirname(__file__))
 
 core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()},
-          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall},hitboxMetadataJSON='configs/config_hitboxes.json')
+          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall,'SpawnPoint':SpawnPoint},hitboxMetadataJSON='configs/config_hitboxes.json')
 
 # spawn initial bg objects
 for chunk in core.tilemapProcessor.openChunks:
@@ -191,6 +191,7 @@ def run():
     while core.playing:
 
         core.update()
+
 
 
         # quit_log += 1/60
