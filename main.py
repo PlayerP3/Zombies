@@ -18,6 +18,7 @@ from pynaccle.animatedsprite import AnimatedSprite
 from door import Door
 from wall import Wall
 from spawnpoint import SpawnPoint
+from buildable import Part,Bench
 
 
 # init engine
@@ -26,7 +27,7 @@ core = Pyn.Engine()
 print(os.path.dirname(__file__))
 
 core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()},
-          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall,'SpawnPoint':SpawnPoint},hitboxMetadataJSON='configs/config_hitboxes.json')
+          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall,'SpawnPoint':SpawnPoint,'Bench':Bench},hitboxMetadataJSON='configs/config_hitboxes.json')
 
 # spawn initial bg objects
 for chunk in core.tilemapProcessor.openChunks:
@@ -36,6 +37,9 @@ for chunk in core.tilemapProcessor.openChunks:
 
         if gameobj.inaccessible:
             core.tilemapProcessor.inaccessible_tiles.append(gameobj.spawnLocation)
+
+        elif not gameobj.inaccessible:
+            core.tilemapProcessor.accessible_tiles.append(gameobj.spawnLocation)
     
 # spawn initial objects
 for gameobj in core.objectManager.active_pool:
@@ -63,10 +67,12 @@ from pynaccle.pathfinding import Pathfinding,build_astar_graph,build_true_cleara
 random.seed()
 
 # load files in
-with open('configs/config_player.json','r') as player_attributes_file, open('configs/config_hud_elements.json','r') as hudelements_attributes_file:
+with open('configs/config_player.json','r') as player_attributes_file, open('configs/config_hud_elements.json','r') as hudelements_attributes_file, \
+    open('configs/config_buildable.json','r') as buidlable_attributes_file:
 
     player_parameters = json.load(player_attributes_file)
     hudelements_parameters = json.load(hudelements_attributes_file)
+    buildable_parameters = json.load(buidlable_attributes_file)
 
 
 # add enemies to inactive pool
@@ -184,6 +190,36 @@ def run():
     # add objs to active pool
     core.objectManager.active_pool.append(player)
     core.objectManager.active_pool.append(round_manager)
+
+    # load buildables
+    buildableData = {}
+
+    for buildable in buildable_parameters:
+
+        # add image path
+        buildableData[buildable] = buildable_parameters[buildable]['img_path']
+
+        # add as key in player collected parts
+        player.collectedParts[buildable] = []
+
+        for bPart in buildable_parameters[buildable]["Parts"]:
+
+            # init and spawn part
+            gameobj = Part()
+
+            set_attributes(game_object=gameobj,attributes=buildable_parameters[buildable]["Parts"][bPart])
+            gameobj.init()
+            gameobj.spawn(pos=gameobj.spawnLocation)
+
+            # add to tilemap connected chunk
+            core.tilemapProcessor.chunkObj[gameobj.connectedChunk].append(gameobj)
+
+    # if there are any work benches inject buildable data into them
+    workbenches = core.tilemapProcessor.get_obejcts(className="Bench")
+    for wb in workbenches:
+        wb.buildableData = buildable_parameters
+
+
     
     
     core.state.enter()

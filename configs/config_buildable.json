@@ -1,0 +1,29 @@
+{
+    "RobotBoy":
+
+        {"Parts":
+            {
+                "Part1":{
+                    "spawnLocation":[64,64],
+                    "connectedChunk":"0",
+                    "img_path":"Sprites/Miscellaneous/WallBuys/Ammo_32x32.png",
+                    "name":"Part1",
+                    "interact_time_limit": 0.2
+                },
+
+                "Part2":{
+                    "spawnLocation":[-128,128],
+                    "connectedChunk":"0",
+                    "img_path":"Sprites/Miscellaneous/WallBuys/Ammo_32x32.png",
+                    "name":"Part2",
+                    "interact_time_limit": 0.2
+
+                }
+
+            },
+
+        "img_path":"Sprites/Miscellaneous/Buildable/RoboBoy_32x32.png",
+        "partsNeeded":2
+        }
+            
+}

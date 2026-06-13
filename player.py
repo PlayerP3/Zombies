@@ -66,6 +66,9 @@ class Player(Moveable_Object,PlayerStateMachine):
         # list of items
         self.picked_items = []
 
+        # collected buildable parts
+        self.collectedParts = {}
+
         # slide variable
         self.slide_friction = 3
 
@@ -114,7 +117,8 @@ class Player(Moveable_Object,PlayerStateMachine):
 
         if game_object.object_of_origin == 'Game':
 
-            if game_object.__class__.__name__ in ['Wall','Door']:
+            # if game_object.__class__.__name__ in ['Wall','Door']:
+            if array_is_in_array(get_mro(gameObject=game_object),['Wall','Interactable']):
 
                 # sys.exit()
 

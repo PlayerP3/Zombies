@@ -10,17 +10,13 @@ from pynaccle.pathfinding import *
 
 class Door(Interactable,Wall):
 
-    def __init__(self,connectedChunk:int=0):
+    def __init__(self):
 
-        self.hitbox = pygame.FRect(0,0,100,100)
-
-        self.connectedChunk = connectedChunk
 
         Wall.__init__(self)
         Interactable.__init__(self)
         
         
-     
 
     def init(self):
 
@@ -79,7 +75,6 @@ class Door(Interactable,Wall):
     def update_data(self):
 
         self.update_position()
-        self.hitbox.center = self.hurtbox.center
 
 # for wb in wallbuy_parameters:
 
