@@ -19,6 +19,7 @@ from door import Door
 from wall import Wall
 from spawnpoint import SpawnPoint
 from buildable import Part,Bench
+from soulbox import Soulbox,Soul
 
 
 # init engine
@@ -27,7 +28,7 @@ core = Pyn.Engine()
 print(os.path.dirname(__file__))
 
 core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()},
-          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall,'SpawnPoint':SpawnPoint,'Bench':Bench},hitboxMetadataJSON='configs/config_hitboxes.json')
+          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall,'SpawnPoint':SpawnPoint,'Bench':Bench,'Soulbox':Soulbox},hitboxMetadataJSON='configs/config_hitboxes.json')
 
 # spawn initial bg objects
 for chunk in core.tilemapProcessor.openChunks:
@@ -63,6 +64,7 @@ from pynaccle.pathfinding import Pathfinding,build_astar_graph,build_true_cleara
 
 
 
+
 # set random seed
 random.seed()
 
@@ -75,8 +77,10 @@ with open('configs/config_player.json','r') as player_attributes_file, open('con
     buildable_parameters = json.load(buidlable_attributes_file)
 
 
-# add enemies to inactive pool
+# add objects to inactive pool
 objectManager.inactive_pool["Enemy"] = [Enemy() for _ in range(500)]
+objectManager.inactive_pool["Soul"] = [Soul() for _ in range(200)]
+
 
 # player
 player = Player()

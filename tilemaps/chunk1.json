@@ -2519,6 +2519,17 @@
                 "class": "SpawnPoint",
                 "inaccessible":false
             },
+            "(96.0, -384.0)": {
+                "AnimatedSprite": {
+                    "hurtbox_width": 23.0,
+                    "hurtbox_height": 36.0,
+                    "direction": 0,
+                    "img_path": "Sprites/Soulbox/TestTubes_32x32.png"
+                },
+                "class": "Soulbox",
+                "inaccessible":true,
+                "name":"TestTubes"
+            },
             "(-416.0, -352.0)": {
                 "AnimatedSprite": {
                     "hurtbox_width": 23.0,

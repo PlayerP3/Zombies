@@ -8,6 +8,7 @@ from pynaccle.tilemap import tilemapProcessor
 from pynaccle.objectsystem import objectManager
 from pynaccle.pathfinding import *
 from pynaccle.animatedsprite import AnimatedSprite
+from gun import guns
 
 class Part(Interactable):
 
@@ -123,6 +124,10 @@ class Bench(Interactable):
                 self.display_item.hurtbox.center = (self.hurtbox.centerx,self.hurtbox.centery - 14)
 
                 self.buildableBuilt = True
+                
+                self.display_message.img_path = 'Hold E to equip'
+
+                self.interactingObj.is_interacting = False
             
             # give to player
             elif not self.buildableTaken:
@@ -131,13 +136,110 @@ class Bench(Interactable):
                 self.display_message.img_path = ' '
                 
                 # run effect depending on interactable
-                self.run_effect(gameobj=gameobj)
+                self.give_weapon(gameobj=self.interactingObj)
               
                 self.buildableTaken = True
 
 
+    # swap weapon function
+    def give_weapon(self,gameobj):
+
+        # first end weapon state
+        gameobj.weapon.state.completed()
+
+        # find first element in list which is current weapon
+        current_weapon = gameobj.allWeapons[0]
+        
+        # set weapon to give to player
+        weapon_to_give = self.buildableObject
+
+        if len(gameobj.allWeapons) < gameobj.weaponCarryLimit:
+
+            # remove current weapon and add to end of list
+            gameobj.allWeapons.insert(0,weapon_to_give)
+
+
+        elif len(gameobj.allWeapons) >= gameobj.weaponCarryLimit:
+
+            # remove current weapon and add to end of list
+            gameobj.allWeapons.remove(current_weapon)
+            gameobj.allWeapons.insert(0,weapon_to_give)
+
+        # set new weapon
+        gameobj.weapon = guns[weapon_to_give]
+        gameobj.weapon.wielded_by = gameobj
+
+        # enter state
+        gameobj.weapon.state = gameobj.weapon.states['PICKUP']
+        gameobj.weapon.state.enter()
+
+
             
+    # wall collision check
+    def collision_check(self,axis:str='y'):
+
+        # if it has been built and taken just continue
+        if self.interactingObj:
+            pass
+
+
+        if not self.interactingObj:
+
+            if self.__class__.__name__ == "Wall":
+                return
+
+            # find surrounding objects
+            self.find_surrounding_game_objects()  
+
+            # separate self objects from different objects
+            self_origin_surrounding_objects  = [x for x in self.surrounding_game_objects if x.object_of_origin == self.object_of_origin]  
+            different_origin_surrounding_objets = [x for x in self.surrounding_game_objects if x.object_of_origin != self.object_of_origin]  
+
+            
+            # print(objectManager.object_positions[(-224.0, -160.0)])
+            # sys.exit()
+            # go through all possible game objects
+            for game_object in self.surrounding_game_objects:
+
+                if not game_object.can_collide:
+                    continue
+
+                # if wall/door use hirtbox collision instead of hitbox
+                if array_is_in_array(get_mro(gameObject=game_object),['Wall','Interactable']): 
+
+    
+                    # rect collision check
+                    if self.hurtbox.colliderect(game_object.hurtbox):
+
+                        # handle collision
+                        self.handle_collision(game_object=game_object,axis=axis)
+
+
+                else:
+                   
+                    collision,hitbox = self.hitbox_collision(game_object=game_object)
+
+                    if collision:
+
+                        self.handle_collision(game_object=game_object,axis=axis)
+                        self.interactingObj = game_object
+
+        # if something is interacting already
+        elif self.interactingObj:
+
+            collision,hitbox = self.hitbox_collision(game_object=self.interactingObj)
+
+            if collision:
+
+                self.handle_collision(game_object=self.interactingObj,axis=axis)
+
+            elif not collision:
+
+                # remove interacting obj
+                self.interactingObj.is_interacting = False
+                self.interactingObj = None
                 
+
 
         
     # handle collision once the check is confirmed
@@ -151,66 +253,78 @@ class Bench(Interactable):
 
             if game_object.__class__.__name__ == 'Player':
 
-                # only if we have bench specific things to build
-                if self.buildableObject:
+                if not self.buildableBuilt:
 
-                    # check if the player has the buildable object and the right amouint
-                    if self.buildableObject not in game_object.collectedParts:
-                        self.display_message.img_path = f"Wrong work bench"
-                
+                    # only if we have bench specific things to build
+                    if self.buildableObject:
+
+                        # check if the player has the buildable object and the right amouint
+                        if self.buildableObject not in game_object.collectedParts:
+                            self.display_message.img_path = f"Wrong work bench"
                     
-                    elif self.buildableObject in game_object.collectedParts:
                         
-                        if len(game_object.collectedParts[self.buildableObject]) != self.buildableData[self.buildableObject]['partsNeeded']:
-                            self.display_message.img_path = f"Not enough parts"
+                        elif self.buildableObject in game_object.collectedParts:
                             
-                        
-                        elif len(game_object.collectedParts[self.buildableObject]) == self.buildableData[self.buildableObject]['partsNeeded']:
-                        
-                            # set display message and item image path
-                            self.display_message.img_path = f"Hold E to interact"
-                            self.display_item.img_path = self.buildableData[self.buildableObject]['img_path']
-
-                            # if player is interacting
-                            if game_object.is_interacting:
-                                self.state.emit('INTERACTING')
-
-                            # if player is interacting
-                            elif not game_object.is_interacting:
-                                self.state.emit('IDLE')
-
-                # if theres nothing specific that goes 
-                elif not self.buildableObject:
-
-                    if not game_object.collectedParts:
-                        self.display_message.img_path = f"Not enough parts"
-                  
-
-                    elif game_object.collectedParts:
-
-                        # go through all possible buildable objs
-                        for buildable in game_object.collectedParts:
-
-                            if len(game_object.collectedParts[buildable]) != self.buildableData[buildable]['partsNeeded']:
+                            if len(game_object.collectedParts[self.buildableObject]) != self.buildableData[self.buildableObject]['partsNeeded']:
                                 self.display_message.img_path = f"Not enough parts"
-                                continue
                                 
-                            elif len(game_object.collectedParts[buildable]) == self.buildableData[buildable]['partsNeeded']:
-
-                                # set message and img path
+                            
+                            elif len(game_object.collectedParts[self.buildableObject]) == self.buildableData[self.buildableObject]['partsNeeded']:
+                            
+                                # set display message and item image path
                                 self.display_message.img_path = f"Hold E to interact"
-                                self.display_item.img_path = self.buildableData[buildable]['img_path']
+                                self.display_item.img_path = self.buildableData[self.buildableObject]['img_path']
 
                                 # if player is interacting
                                 if game_object.is_interacting:
-                                    
                                     self.state.emit('INTERACTING')
 
                                 # if player is interacting
                                 elif not game_object.is_interacting:
                                     self.state.emit('IDLE')
 
-                            
+                    # if theres nothing specific that goes 
+                    elif not self.buildableObject:
+
+                        if not game_object.collectedParts:
+                            self.display_message.img_path = f"Not enough parts"
+                    
+
+                        elif game_object.collectedParts:
+
+                            # go through all possible buildable objs
+                            for buildable in game_object.collectedParts:
+
+                                if len(game_object.collectedParts[buildable]) != self.buildableData[buildable]['partsNeeded']:
+                                    self.display_message.img_path = f"Not enough parts"
+                                    continue
+                                    
+                                elif len(game_object.collectedParts[buildable]) == self.buildableData[buildable]['partsNeeded']:
+
+                                    # set message and img path
+                                    self.display_message.img_path = f"Hold E to interact"
+                                    self.display_item.img_path = self.buildableData[buildable]['img_path']
+
+                                    # if player is interacting
+                                    if game_object.is_interacting:
+                                        
+                                        self.buildableObject = buildable
+                                        self.state.emit('INTERACTING')
+
+                                    # if player is interacting
+                                    elif not game_object.is_interacting:
+                                        self.state.emit('IDLE')
+
+                elif not self.buildableTaken:
+
+                    # if player is interacting
+                    if game_object.is_interacting:
+                        self.state.emit('INTERACTING')
+
+                    # if player is interacting
+                    elif not game_object.is_interacting:
+                        self.state.emit('IDLE')
+
                 
                 # init sprite
                 self.display_message.init_sprite()
@@ -226,7 +340,7 @@ class Bench(Interactable):
         self.update_position()
 
         # if object built then diplsay it
-        if self.buildableBuilt:
+        if self.buildableBuilt and not self.buildableTaken:
 
             # display message
             self.display_item.draw_surface(position=self.display_item.hurtbox.center)
