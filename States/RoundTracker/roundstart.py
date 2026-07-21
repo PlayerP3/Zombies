@@ -1,7 +1,7 @@
 import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
+from pynaccle.statemachine import State
 import numpy as np
 
 class RoundStart(State):
@@ -47,7 +47,7 @@ class RoundStart(State):
         self.run_timer()
 
         # flicker alpha for connected hud
-        self.parent_node.connected_hud.alpha = np.clip(255 * self.map_to_sine_wave(),0,255)
+        self.parent_node.connected_hud.alpha = np.clip(1 * self.map_to_sine_wave(),0,1)
 
         # if timer complete add number to rounds and move to before round start
         if self.timer_complete:

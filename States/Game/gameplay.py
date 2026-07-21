@@ -1,7 +1,8 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
+from pynaccle.statemachine import State
+from pynaccle.tilemap import tilemapProcessor
 
 pass
 
@@ -13,17 +14,24 @@ class Gameplay(State):
 
     def enter(self):
 
+        self.parent_node.screenManager.windows['win'].zoom = self.parent_node.screenManager.windows['win'].stateZoom[self.__class__.__name__.upper()]
         self.parent_node.overlay.activate_hud_elements(['PlayerHealth','RoundNumber','Ammo','Points'])
         self.parent_node.overlay.deactivate_hud_elements(['Splash','Pause'])
+        
 
-        self.parent_node.screenManager.windows['win'].pos = self.parent_node.objectManager.player.hurtbox.center
+        # self.parent_node.overlay.deactivate_hud_elements(['Splash','Pause','PlayerHealth','RoundNumber','Ammo','Points'])
+
+        # self.parent_node.screenManager.windows['win'].bg_offset_y = 400
+        # self.parent_node.screenManager.windows['win'].bg_offset_x = 400
+
+        # self.parent_node.screenManager.windows['win'].pos = (400,400)
         self.parent_node.screenManager.windows['win'].focus = self.parent_node.objectManager.player.hurtbox.center
         self.parent_node.screenManager.windows['win'].track_object_spring()
 
-        self.parent_node.screenManager.windows['fog_of_war'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
-        self.parent_node.screenManager.windows['fog_of_war'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
-        self.parent_node.screenManager.windows['wincopy'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
-        self.parent_node.screenManager.windows['wincopy'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
+        # self.parent_node.screenManager.windows['fog_of_war'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
+        # self.parent_node.screenManager.windows['fog_of_war'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
+        # self.parent_node.screenManager.windows['wincopy'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
+        # self.parent_node.screenManager.windows['wincopy'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
         # self.parent_node.screenManager.windows['fog_of_war'].track_object_spring()
 
 
@@ -32,37 +40,49 @@ class Gameplay(State):
         self.submit_event_processing()
 
         # fill window
-        self.parent_node.screenManager.windows['win'].win.fill((200,0,0))
+        # self.parent_node.screenManager.windows['win'].win.fill((0,0,0))
         # self.parent_node.screenManager.windows['win'].win.blit(self.parent_node.screenManager.windows['Chunk1'].win,(0,0))
-        self.parent_node.screenManager.windows['win'].draw_surface(self.parent_node.screenManager.windows['Chunk1'].win)
+
+        # self.parent_node.screenManager.windows['win'].draw_surface(self.parent_node.screenManager.windows['Chunk1'].win,position=(-320,-180))
+
+        # draw chunks
+        # for chunk in tilemapProcessor.openChunks:
+        #     self.parent_node.screenManager.windows[f'chunk{chunk}'].submit_to_render()
+
+            # self.parent_node.screenManager.windows['win'].draw_tilemap(self.parent_node.screenManager.windows[f'chunk{chunk}'].win,position=(-self.parent_node.screenManager.windows[f'chunk{chunk}'].win_width//2,-self.parent_node.screenManager.windows[f'chunk{chunk}'].win_height//2))
+        
+        # self.parent_node.screenManager.windows['win'].win.blit(self.parent_node.screenManager.windows['Chunk1'].win,(640-1600,360-1600))
 
         # self.parent_node.screenManager.windows['win'].win_copy = self.parent_node.screenManager.windows['win']
 
-        # engine.camera.track_position(window=engine.windows.win)
+        # pynaccle.camera.track_position(window=pynaccle.windows.win)
+        # self.parent_node.screenManager.windows['win'].pos = self.parent_node.objectManager.player.hurtbox.center
+
         self.parent_node.screenManager.windows['win'].focus = self.parent_node.objectManager.player.hurtbox.center
         self.parent_node.screenManager.windows['win'].track_object_spring()
-        self.parent_node.screenManager.windows['fog_of_war'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
-        self.parent_node.screenManager.windows['fog_of_war'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
-        self.parent_node.screenManager.windows['wincopy'].bg_offset_x = self.parent_node.screenManager.windows['win'].bg_offset_x
-        self.parent_node.screenManager.windows['wincopy'].bg_offset_y = self.parent_node.screenManager.windows['win'].bg_offset_y
 
-        self.parent_node.screenManager.windows['playeroverlay'].win.fill((0,0,0,0))
+        # self.parent_node.screenManager.windows['playeroverlay'].win.fill((0,0,0,0))
         
 
-        # run game object behaviour
+        # run game object behaviour and bj objects
+        
+        self.parent_node.objectManager.update_background_objects()
         self.parent_node.objectManager.update_game_objects()
 
         # display hud
         self.parent_node.overlay.display_hud()
 
+        # draw player overlay
+        # self.parent_node.screenManager.windows['win'].draw_overlay(self.parent_node.screenManager.windows['playeroverlay'].win,ignoreCameraOffset=True,zlayer=7)
+
         # self.parent_node.display_game_tiles()
 
         # draw all objects onto the window
         self.parent_node.screenManager.render_windows()
-        self.parent_node.screenManager.windows['win'].win.blit(self.parent_node.screenManager.windows['playeroverlay'].win,(0,0))
 
         # scale the window, and blit to display
-        pygame.transform.scale(self.parent_node.screenManager.windows['win'].win,(self.parent_node.screenManager.fullscreen_width,self.parent_node.screenManager.fullscreen_height),self.parent_node.screenManager.screen)
+        # pygame.transform.scale(self.parent_node.screenManager.windows['Chunk1'].win,(self.parent_node.screenManager.fullscreen_width,self.parent_node.screenManager.fullscreen_height),self.parent_node.screenManager.screen)
+
 
         # update display
         pygame.display.flip()
@@ -72,4 +92,5 @@ class Gameplay(State):
         if event.type == pygame.KEYDOWN:
 
             if event.key == pygame.K_ESCAPE:
-                self.emit('PAUSED')
+                # self.emit('PAUSED')
+                self.emit('QUIT')

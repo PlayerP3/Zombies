@@ -1,7 +1,7 @@
 import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
+from pynaccle.statemachine import State
 
 class RoundInProgress(State):
 
@@ -16,7 +16,7 @@ class RoundInProgress(State):
         self.timer_complete = False
         
         # self.parent_node.connected_hud.text_colour = 'red'
-        self.parent_node.connected_hud.alpha = 255
+        self.parent_node.connected_hud.alpha = 1
 
     # keep track of time between rounds
     def update(self):

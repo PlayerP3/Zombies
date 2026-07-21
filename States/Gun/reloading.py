@@ -1,7 +1,7 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
+from pynaccle.statemachine import State
 
 
 class Reloading(State):
@@ -15,6 +15,9 @@ class Reloading(State):
         # set reloading animation stuff
         self.parent_node.reloading_timer.timer_init()
         self.parent_node.reloading_timer.timer_complete = False
+
+        # reset interactions
+        self.parent_node.wielded_by.is_interacting = False
 
     def update(self):
 
