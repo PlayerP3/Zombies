@@ -1,7 +1,7 @@
 from pynaccle.utils import *
 import json
 from pynaccle.moveableobject import Moveable_Object
-from pynaccle.interactable import Interactable,Idle,Interacting
+from pynaccle.interactable import Interactable,Idle
 from wall import Wall
 import sys
 from pynaccle.tilemap import tilemapProcessor
@@ -10,30 +10,23 @@ from pynaccle.pathfinding import *
 
 class Door(Interactable,Wall):
 
-    def __init__(self,connectedChunk:int=0):
+    def __init__(self):
 
-        self.hitbox = pygame.FRect(0,0,100,100)
-
-        self.connectedChunk = connectedChunk
 
         Wall.__init__(self)
         Interactable.__init__(self)
+
+        self.name = 'Door'
         
         
-     
 
     def init(self):
 
-        # display message init
-        self.display_message.is_text = True
-        self.display_message.img_path = f"Hold E to buy {self.name} [Cost:{self.cost}]"
-        self.display_message.init_sprite()
-        self.display_message.hurtbox.center = (0,0)
-        self.display_message.timer_limit = 1
-        
-        
-
         super().init()
+
+        # display message init
+        self.display_message.init()
+        self.display_message.update_message(f"Hold E to buy {self.name} [Cost:{self.cost}]")        
 
     # what happens when pickup is done like changing stats etc
     def pay(self,gameobj):
@@ -45,7 +38,7 @@ class Door(Interactable,Wall):
             # set to inactive
             self.is_active = False
 
-            objectManager.add_chunk(self.connectedChunk)
+            tilemapProcessor.add_chunk("1")
 
             if self.current_tile_position in tilemapProcessor.inaccessible_tiles:
                 tilemapProcessor.inaccessible_tiles.remove(self.current_tile_position)
@@ -66,7 +59,9 @@ class Door(Interactable,Wall):
             if game_object.__class__.__name__ == 'Player':
                     
                 # display message
-                self.display_message.draw_surface(position=(self.hurtbox.topright[0]+3,self.hurtbox.topright[1]-3))
+                # self.display_message.draw_surface(position=(self.hurtbox.topright[0]+3,self.hurtbox.topright[1]-3))
+                self.display_message.hurtbox.center = (self.hurtbox.topright[0] + 5, self.hurtbox.topright[1] - 5)
+                self.display_message.submit_to_render()
 
                 # if player is interacting
                 if game_object.is_interacting:
@@ -79,7 +74,6 @@ class Door(Interactable,Wall):
     def update_data(self):
 
         self.update_position()
-        self.hitbox.center = self.hurtbox.center
 
 # for wb in wallbuy_parameters:
 

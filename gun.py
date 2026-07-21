@@ -18,23 +18,6 @@ with open(os.path.join(os.path.dirname(__file__),'configs/config_gun.json'),'r')
 
     gun_parameters = json.load(gun_attributes_file)
 
-
-
-
-    # def create_split_bullets(self):
-    #     pass
-
-    # def explode(self):
-    #     pass
-
-    # def enemy_collision_rects(self):
-    #     pass
-
-    # def handle_damage_and_score(self):
-    #     pass
-
-
-
 class GunStateMachine(StateMachine):
 
     def __init__(self):
@@ -89,6 +72,11 @@ class Gun(Weapon,GunStateMachine):
         super().init()
 
 
+    def max_ammo(self):
+
+        self.total_ammo_stock = self.original_vars['total_ammo_stock']
+        self.bullets_remaining_in_mag = self.magazine_size
+        
         
 
         
@@ -108,9 +96,6 @@ class Gun(Weapon,GunStateMachine):
 
                     # set projectile manager
                     bullet.projectile_manager = self
-
-                    # set image path
-                    bullet.img_path = f"Sprites/Cards/Hearts/Back.png"
 
                     set_attributes(game_object=bullet,attributes=self.projectile_attributes[bullet_object])
 
@@ -176,9 +161,6 @@ class Gun(Weapon,GunStateMachine):
                         # set projectile manager
                         bullet.projectile_manager = self
 
-                        # set image path
-                        bullet.img_path = f"Sprites/Cards/Hearts/Back.png"
-
                         set_attributes(game_object=bullet,attributes=self.projectile_attributes[bullet_object])
 
                         # init the bullet
@@ -240,13 +222,13 @@ class Gun(Weapon,GunStateMachine):
 objectManager.inactive_pool["Bullet"] = [Bullet() for _ in range(1500)]
 
 
-# create a weapon for each gun type and init it
-guns = {g:Gun() for g in gun_parameters}
+# # create a weapon for each gun type and init it
+# guns = {g:Gun() for g in gun_parameters}
 
-for gn,gun in guns.items():
+# for gn,gun in guns.items():
 
-    set_attributes(game_object=gun,attributes=gun_parameters[gn])
-    gun.init()
-    store_original_vars(game_object=gun)
+#     set_attributes(game_object=gun,attributes=gun_parameters[gn])
+#     gun.init()
+#     store_original_vars(game_object=gun)
 
 

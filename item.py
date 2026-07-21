@@ -4,7 +4,7 @@ from pynaccle.utils import *
 import random,json
 from pynaccle.moveableobject import Moveable_Object
 from pynaccle.objectsystem import objectManager
-from pynaccle.interactable import Interactable,Idle,Interacting
+from pynaccle.interactable import Interactable,Idle
 # from miscsprites import MiscellaneousMgr
 
 # load in parameters
