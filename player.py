@@ -1,6 +1,6 @@
 import pygame,os,re,sys
 from pygame.math import Vector2
-from gun import guns
+from gun import Gun,gun_parameters
 from pynaccle.statemachine import StateMachine
 from States.Player.idle import Idle
 from States.Player.walking import Walking
@@ -8,6 +8,8 @@ from States.Player.running import Running
 from pynaccle.moveableobject import Moveable_Object
 from pynaccle.utils import *
 from pynaccle.screen import gameScreen
+from pynaccle.inventory import Inventory
+
 
 pygame.font.init()
 
@@ -31,6 +33,8 @@ class PlayerStateMachine(StateMachine):
 
         self.state.update()
 
+        # print(self.state.__class__.__name__)
+
         # update position
         self.update_position()
 
@@ -51,20 +55,23 @@ class Player(Moveable_Object,PlayerStateMachine):
 
         self.mouse_pos = (0,0)
 
+        # create inventory obj
+        self.inventory = Inventory()
+
         # starting weapon
         self.starting_weapon = 'Pistol'
 
-        # current weapon
-        self.weapon = guns[self.starting_weapon]
-
-        # all weapons
-        self.allWeapons = [self.starting_weapon]
+        # store cache of all weapons we have used
+        self.cachedWeapons = {}
 
         # total number of weapons player can carry
         self.weaponCarryLimit = 2
 
         # list of items
         self.picked_items = []
+
+        # collected buildable parts
+        self.collectedParts = {}
 
         # slide variable
         self.slide_friction = 3
@@ -75,11 +82,16 @@ class Player(Moveable_Object,PlayerStateMachine):
         # target position for shooting
         self.shooting_target_position = (0,0)
 
+        # give starting weapon, added to inventory in give wepaon function
+        self.weapon = None
+        self.inventory.inventory['weapons'] = []
+        give_weapon(gameobj=self,weaponName=self.starting_weapon,weaponClass=Gun,weaponParams=gun_parameters)
 
     # function to link set attirbutes, init and storing original values on obj start
     def start(self,attributes:dict):
 
         set_attributes(game_object=self,attributes=attributes)
+        # self.shader = 'dissolve'
         self.init()
         store_original_vars(game_object=self)
 
@@ -102,6 +114,8 @@ class Player(Moveable_Object,PlayerStateMachine):
         self.update_movement_vectors(unique_id='movement',direction_vectorX=0,direction_vectorY=0,acceleration=5,
                                             Xcceleration_rate=0,Xcceleration_rate_change='negative',max_value=0,
                                             reduce_on_wall_collision=False,reset_on_max_value=False)
+        
+        self.states['RUNNING'].timer_speed = 0.1
         super().init()
 
         
@@ -114,9 +128,8 @@ class Player(Moveable_Object,PlayerStateMachine):
 
         if game_object.object_of_origin == 'Game':
 
-            if game_object.__class__.__name__ in ['Wall','Door']:
-
-                # sys.exit()
+            # if game_object.__class__.__name__ in ['Wall','Door']:
+            if array_is_in_array(get_mro(gameObject=game_object),['Wall','Interactable']):
 
                 if axis == 'x':
                     if self.movement[0] < 0:
@@ -132,8 +145,6 @@ class Player(Moveable_Object,PlayerStateMachine):
                     if self.movement[1] > 0:
                         self.hurtbox.bottom = game_object.hurtbox.top
 
-                
-  
     # apply a slow down effect to movement if no keys are being pressed
     def slide_after_stop(self):
 
@@ -169,64 +180,18 @@ class Player(Moveable_Object,PlayerStateMachine):
         mouse_pos = pygame.mouse.get_pos()
 
         # adjust mouse position because of rescaling
-        x = (mouse_pos[0]/(gameScreen.fullscreen_width/gameScreen.windows[self.surface_to_draw_on].win.get_width()) - gameScreen.windows[self.surface_to_draw_on].bg_offset_x)/gameScreen.windows[self.surface_to_draw_on].zoom
-        y = (mouse_pos[1]/(gameScreen.fullscreen_height/gameScreen.windows[self.surface_to_draw_on].win.get_height()) - gameScreen.windows[self.surface_to_draw_on].bg_offset_y)/gameScreen.windows[self.surface_to_draw_on].zoom
+        # x = (mouse_pos[0]/(gameScreen.fullscreen_width/gameScreen.windows[self.surface_to_draw_on].win.get_width()) - gameScreen.windows[self.surface_to_draw_on].bg_offset_x)/gameScreen.windows[self.surface_to_draw_on].zoom
+        # y = (mouse_pos[1]/(gameScreen.fullscreen_height/gameScreen.windows[self.surface_to_draw_on].win.get_height()) - gameScreen.windows[self.surface_to_draw_on].bg_offset_y)/gameScreen.windows[self.surface_to_draw_on].zoom
+
+        x = ((mouse_pos[0]/(gameScreen.fullscreen_width/gameScreen.windows['win'].win_width)) - (gameScreen.windows['win'].win_width//2) - (gameScreen.windows[self.surface_to_draw_on].bg_offset_x))
+        y = ((mouse_pos[1]/(gameScreen.fullscreen_height/gameScreen.windows['win'].win_height)) - (gameScreen.windows['win'].win_height//2) - (gameScreen.windows[self.surface_to_draw_on].bg_offset_y))
+        # print(x,y)
+
+        # print(self.hurtbox.center)
 
         self.shooting_target_position = (x,y)
         self.weapon.shooting_start_position = self.hurtbox.center
 
-    # swap weapon function
     def swap_weapon(self):
 
-        if len(self.allWeapons) > 1:
-
-            # first end weapon state
-            self.weapon.state.completed()
-
-            # find first element in list which is current weapon
-            current_weapon = self.allWeapons[0]
-            
-            # find second element in list which is next weapon
-            next_weapon = self.allWeapons[1]
-
-            # remove current weapon and add to end of list
-            self.allWeapons.pop(0)
-            self.allWeapons.append(current_weapon)
-
-            # set new weapon
-            self.weapon = guns[next_weapon]
-            self.weapon.wielded_by = self
-
-            # enter state
-            self.weapon.state = self.weapon.states['PULLOUT']
-            self.weapon.state.enter()
-        
-    # behaviour function
-    def run_behaviour(self):
-
-        if self.is_active:
-
-            self.update_position()
-
-            # self.find_surrounding_game_objects()
-
-            self.update_shooting_target_position()
-
-            self.slide_after_stop()
-
-            # self.move2()
-            # draw surface
-            
-            self.move_and_collide()
-
-            self.movement_raycast.init({'starting_position':self.hurtbox.center,"target_position":self.shooting_target_position})
-            self.movement_raycast.apply_fog_of_war()
-            
-            self.draw_surface(position=self.hurtbox.center)
-
-
-            # draw rect for debugging 
-            self.draw_rect(position=self.hurtbox.center)
-
-            # self.draw_hitbox(position=self.hitbox.center)
-
+        swap_weapon(self)

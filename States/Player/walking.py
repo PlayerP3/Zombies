@@ -1,7 +1,7 @@
 import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
+from pynaccle.statemachine import State
 
 class Walking(State):
 
@@ -34,10 +34,11 @@ class Walking(State):
 
         # movement raycast
         self.parent_node.movement_raycast.init({'starting_position':self.parent_node.hurtbox.center,"target_position":self.parent_node.shooting_target_position})
-        self.parent_node.movement_raycast.apply_fog_of_war()
+        # self.parent_node.movement_raycast.apply_fog_of_war()
 
         # draw surface
-        self.parent_node.draw_surface(position=self.parent_node.hurtbox.center)
+        self.parent_node.submit_to_render()
+        # self.parent_node.draw_surface(position=self.parent_node.hurtbox.center)
 
         self.parent_node.weapon.update()
 

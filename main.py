@@ -18,28 +18,44 @@ from pynaccle.animatedsprite import AnimatedSprite
 from door import Door
 from wall import Wall
 from spawnpoint import SpawnPoint
+from buildable import Part,Bench
+from soulbox import Soulbox,Soul
+from pynaccle.chunks import Chunk
+from pynaccle.roulette import Roulette
+from weaponbox import Weaponbox
+
 
 # init engine
 core = Pyn.Engine()
 
-print(os.path.dirname(__file__))
-
 core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()},
-          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall})
+          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall,'SpawnPoint':SpawnPoint,'Bench':Bench,'Soulbox':Soulbox,'Chunk':Chunk,'Roulette':Roulette,'Weaponbox':Weaponbox},hitboxMetadataJSON='configs/config_hitboxes.json')
 
-# spawn initial objects
+# spawn initial bg objects
+for chunk in core.tilemapProcessor.openChunks:
+
+    for gameobj in core.tilemapProcessor.chunkObj[chunk]:
+        gameobj.init()
+        gameobj.spawn(pos=(gameobj.spawnLocation),vertice='center')
+
+        # if chunk then dont add accessibility
+        if gameobj.__class__.__name__ == 'Chunk':
+            gameobj.dissolveTimer.elapsed_time = 1
+            continue
+
+        if gameobj.inaccessible:
+            core.tilemapProcessor.inaccessible_tiles.append(gameobj.spawnLocation)
+
+        elif not gameobj.inaccessible:
+            core.tilemapProcessor.accessible_tiles.append(gameobj.spawnLocation)
+
+    # core.tilemapProcessor.chunkObj[chunk] = core.tilemapProcessor.chunkObj[chunk][::-1]
+    
+# spawn initial game objects
 for gameobj in core.objectManager.active_pool:
     gameobj.init()
     gameobj.spawn(pos=gameobj.spawnLocation)
-    # if bbj.__class__.__name__ != 'BgTile':
-    #     bbj.spawnL()
-    
-# spawn initial bg objects
-for chunk in core.tilemapProcessor.openChunks:
-    for gameobj in core.tilemapProcessor.chunkObj[chunk]:
-        gameobj.init()
-        gameobj.spawn(pos=gameobj.spawnLocation,vertex='topleft')
-    
+
 
 import cProfile
 import pstats
@@ -55,20 +71,22 @@ import wallbuy
 from wall import *
 from pynaccle.pathfinding import Pathfinding,build_astar_graph,build_true_clearance_graph
 
-
-
 # set random seed
 random.seed()
 
 # load files in
-with open('configs/config_player.json','r') as player_attributes_file, open('configs/config_hud_elements.json','r') as hudelements_attributes_file:
+with open('configs/config_player.json','r') as player_attributes_file, open('configs/config_hud_elements.json','r') as hudelements_attributes_file, \
+    open('configs/config_buildable.json','r') as buidlable_attributes_file:
 
     player_parameters = json.load(player_attributes_file)
     hudelements_parameters = json.load(hudelements_attributes_file)
+    buildable_parameters = json.load(buidlable_attributes_file)
 
 
-# add enemies to inactive pool
+# add objects to inactive pool
 objectManager.inactive_pool["Enemy"] = [Enemy() for _ in range(500)]
+objectManager.inactive_pool["Soul"] = [Soul() for _ in range(200)]
+
 
 # player
 player = Player()
@@ -79,6 +97,8 @@ core.objectManager.player.spawn((0,0))
 def update_health_hud(hud_element:HUD_element):
 
     hud_element.spriteWidthScale = (core.objectManager.player.health*hud_element.original_vars['spriteWidthScale'])/core.objectManager.player.total_health
+
+    # gameScreen.shaderPrograms[hud_element.shader]['fillProgress'] = hud_element.spriteWidthScale
 
 def update_health_text_hud(hud_element:HUD_element):
 
@@ -153,7 +173,7 @@ def run():
     points_hud.extraProcessing.append(update_points_hud)
     
 
-    # add to hud element group
+    # add to hud element group                                                                             
     core.overlay.add_element(group='PlayerHealth',hud_element=current_health_hud)
     core.overlay.add_element(group='PlayerHealth',hud_element=empty_health_hud)
     core.overlay.add_element(group='PlayerHealth',hud_element=current_health_text_hud)
@@ -165,11 +185,6 @@ def run():
     core.overlay.add_element(group='Pause',hud_element=pauseResumeHud)
     core.overlay.add_element(group='Pause',hud_element=pauseQuitHud)
 
-    # apply alpha/transparency to regular window
-    core.screenManager.windows['win'].win.convert_alpha()
-    core.screenManager.windows['win'].win.set_alpha(100)
-    core.screenManager.windows['fog_of_war'].win.set_colorkey('WHITE')
-
     # connect huds to parent objects
     round_manager.connected_hud = round_number_hud
      
@@ -177,21 +192,48 @@ def run():
     round_manager.state.enter()
     # round_manager.connected_hud = [x for x in pynaccle.hud.hud_elements['RoundNumber'] if x.name == 'RoundNumberHUD'][0]
 
-    
-
     # add objs to active pool
     core.objectManager.active_pool.append(player)
-    # pynaccle.active_pool.append(player.weapon)
     core.objectManager.active_pool.append(round_manager)
-    
-    
+
+    # load buildables
+    buildableData = {}
+
+    for buildable in buildable_parameters:
+
+        # add image path
+        buildableData[buildable] = buildable_parameters[buildable]['img_path']
+
+        # add as key in player collected parts
+        player.collectedParts[buildable] = []
+        
+        for bPart in buildable_parameters[buildable]["Parts"]:
+
+            # init and spawn part
+            gameobj = Part()
+
+            set_attributes(game_object=gameobj,attributes=buildable_parameters[buildable]["Parts"][bPart])
+            gameobj.init()
+            gameobj.spawn(pos=gameobj.spawnLocation)
+
+            # set buidlable object
+            gameobj.buildableObject = buildable
+
+            # add to tilemap connected chunk
+            core.tilemapProcessor.chunkObj[gameobj.connectedChunk].append(gameobj)
+
+    # if there are any work benches inject buildable data into them
+    workbenches = core.tilemapProcessor.get_obejcts(className="Bench")
+    for wb in workbenches:
+        wb.buildableData = buildable_parameters
+
     core.state.enter()
 
     while core.playing:
 
         core.update()
+        core.clock.tick(60)
 
-        # print(core.objectManager.object_positions[(-32.0, -128.0)])
 
         # quit_log += 1/60
         # print(quit_log)
@@ -210,6 +252,3 @@ if __name__ == '__main__':
     # results.sort_stats(pstats.SortKey.TIME)
     # results.print_stats()
 
-
-# run game
-# run()win2

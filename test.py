@@ -130,3 +130,33 @@ x = {'class':'Wall'}
 
 import pynaccle.pens as p
 print(p.penHolder)
+
+
+#version 330 core
+
+# uniform int outlineMode=1;
+# uniform vec4 outlineColour = vec4(0.96, 1.0, 0.0, 1.0);
+# uniform sampler2D memSlot;
+# uniform float alpha=1.0;
+
+
+
+
+# in vec2 uvs;
+# out vec4 f_color;
+
+
+
+# void main() {
+#     vec4 color = texture(memSlot, uvs);
+#     if (outlineMode == 1) {
+#         if (color.r == 0 && color.b == 0 && color.g == 0) {
+#             f_color = vec4(outlineColour.rgb, 1.0);
+#         } 
+#         else {
+#             f_color = color;
+#         }
+#     } else {
+#         f_color = color;
+#     }
+# }

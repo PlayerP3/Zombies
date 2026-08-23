@@ -1,8 +1,8 @@
 import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
-from engine.objectsystem import objectManager
+from pynaccle.statemachine import State
+from pynaccle.objectsystem import objectManager
 import sys
 
 class Shooting(State):
@@ -13,17 +13,20 @@ class Shooting(State):
     def enter(self):
 
         # init the shooting timer
-        self.parent_node.shooting_timer.timer_init()
-        self.parent_node.shooting_timer.timer_complete = True
-        self.parent_node.is_shooting = True
+
+        if self.parent_node.select_fire in ['fullauto','semiauto','pumpaction']:
+            self.parent_node.shooting_timer.timer_init()
+            self.parent_node.shooting_timer.timer_complete = True
             
+
     def update(self):
 
         # submit event processing
         self.submit_event_processing()
 
+
         # check if bullets can be fired
-        self.parent_node.can_shot_be_fired2()
+        self.parent_node.can_shot_be_fired()
 
         # if there is a projectile in the queue
         if self.parent_node.projectile_queue:
@@ -54,13 +57,28 @@ class Shooting(State):
             # if empty start burst countdown to prevent shooting
             if not self.parent_node.projectile_queue:
                 self.burst_countdown_active = True
-                
+        
 
+
+        ## END CONDITIONS ##
         # do a quick check if there the whole magazine size has been fired, if it has then force a reload
-        if self.parent_node.bullets_remaining_in_mag == 0: # here bullets being 0 means that all has been fired
+        if (self.parent_node.select_fire == 'fullauto') and not self.parent_node.projectile_queue and not self.parent_node.bullets_remaining_in_mag: # here bullets being 0 means that all has been fired
                 
             # if we do have ammo then reload
-            self.emit("RELOADING")
+            self.emit("TBNS")
+
+        elif (self.parent_node.select_fire in ['semiauto','pumpaction']) and not self.parent_node.projectile_queue:
+
+            self.emit('TBNS')
+
+       
+
+
+        # if not self.parent_node.projectile_queue and self.parent_node.bullets_remaining_in_mag == 0:
+
+        #     self.emit('TBNS')
+
+
 
     def completed(self):
 
@@ -93,7 +111,10 @@ class Shooting(State):
                 if not self.parent_node.is_dual_wield:
 
                     # set shooting to be true
-                    self.emit('IDLE')
+                    # self.emit('IDLE')
+                    self.emit('TBNS')
+                    self.parent_node.is_shooting = False
+
 
             
         

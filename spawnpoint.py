@@ -24,8 +24,10 @@ class SpawnPoint(Moveable_Object):
             # track current tile
             self.update_position()
 
-            self.draw_surface(position=self.hurtbox.topleft)
-            self.draw_rect(position=self.hurtbox.topleft)
+            self.submit_to_render()
+            
+            # self.draw_surface(position=self.spawnLocation)
+            # self.draw_rect(position=self.hurtbox.topleft)
 
 
 

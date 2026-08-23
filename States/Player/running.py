@@ -1,7 +1,7 @@
 import pygame,os,re,math,random,string
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
+from pynaccle.statemachine import State
 
 class Running(State):
 
@@ -53,22 +53,26 @@ class Running(State):
 
         # movement raycast
         self.parent_node.movement_raycast.init({'starting_position':self.parent_node.hurtbox.center,"target_position":self.parent_node.shooting_target_position})
-        self.parent_node.movement_raycast.apply_fog_of_war()
+        # self.parent_node.movement_raycast.apply_fog_of_war()
 
         # draw surface
-        self.parent_node.draw_surface(position=self.parent_node.hurtbox.center)
+        self.parent_node.submit_to_render()
+        # self.parent_node.draw_surface(position=self.parent_node.hurtbox.center)
 
         self.parent_node.weapon.update()
 
         # end condition
         if sum(self.parent_node.movementx) == 0 and sum(self.parent_node.movementy) == 0:
 
+
             self.emit('IDLE')
 
         elif self.parent_node.stamina <= 0:
-            
-            self.emit('WALKING')
 
+    
+            self.emit('WALKING')
+            
+        
     def handle_event(self, event):
 
         if event.type == pygame.KEYDOWN:

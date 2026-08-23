@@ -1,7 +1,7 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
+from pynaccle.statemachine import State
 
 
 class Pullout(State):
@@ -14,6 +14,9 @@ class Pullout(State):
 
         # inti timer
         self.timer_init()
+
+        # reset interactions
+        self.parent_node.wielded_by.is_interacting = False
 
     def update(self):
 
