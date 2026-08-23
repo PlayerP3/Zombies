@@ -1,0 +1,197 @@
+{
+    "AssaultRifle":
+
+        {
+        "magazine_size":30,
+        "total_ammo_stock":150,
+        "casted_rays":3,
+        "raycast_depth":300,
+        "raycast_width":60,
+        "fire_rate":18,
+        "reload_speed":2,
+        "pullout_time":2,
+        "triggerResetSpeed":0,
+        "name":"AssaultRifle",
+        "weight":52.5,
+        "img_path":"Sprites/Weapons/Regular_32x15.png",
+        "inWeaponBox":true,
+
+        "projectile_attributes":{
+            "Bullet":{
+
+                "spriteWidth":23,
+                "spriteHeight":36,
+                "hurtbox_width":6,
+                "hurtbox_height":12,
+                "speed":300,
+                "sine_movement_amplitude":1,
+                "object_of_origin":"Player",
+                "movement_type":"normal",
+                "travelTimeTimeLimit":2,
+                "rotation_speed":0,
+                "damage":80,
+                "zlayer_drawing":1,
+                "img_path":"Sprites/Bullets/Bullet_6x16.png"
+                }
+        
+                                    }    
+            },
+
+
+    "Pistol":
+
+        {
+        "magazine_size":8,
+        "total_ammo_stock":48,
+        "casted_rays":3,
+        "raycast_depth":300,
+        "raycast_width":60,
+        "fire_rate":12,
+        "reload_speed":2,
+        "pullout_time":1,
+        "select_fire":"semiauto",
+        "triggerResetSpeed":0.13,
+        "name":"Pistol",
+        "weight":0.5,
+        "img_path":"Sprites/Weapons/Pistol_32x19.png",
+        "inWeaponBox":true,
+
+        "projectile_attributes":{
+            "Bullet":{
+
+                "spriteWidth":23,
+                "spriteHeight":36,
+                "hurtbox_width":6,
+                "hurtbox_height":12,
+                "speed":200,
+                "sine_movement_amplitude":1,
+                "object_of_origin":"Player",
+                "movement_type":"normal",
+                "travelTimeTimeLimit":1,
+                "rotation_speed":0,
+                "damage":50,
+                "zlayer_drawing":1,
+                "img_path":"Sprites/Bullets/Bullet_6x16.png"
+                    }
+                                  }    
+            },
+
+
+    "Shotgun":
+
+        {
+        "magazine_size":2,
+        "total_ammo_stock":16,
+        "casted_rays":9,
+        "raycast_depth":100,
+        "raycast_width":60,
+        "fire_rate":12,
+        "reload_speed":2,
+        "pullout_time":1,
+        "select_fire":"pumpaction",
+        "triggerResetSpeed":0.4,
+        "shot_spread_number":5,
+        "shot_spread_pattern":"random",
+        "name":"Shotgun",
+        "weight":0.5,
+        "img_path":"Sprites/Weapons/PumpAction_32x14.png",
+        "inWeaponBox":true,
+
+        "projectile_attributes":{
+            "Bullet":{
+
+                "spriteWidth":23,
+                "spriteHeight":36,
+                "hurtbox_width":6,
+                "hurtbox_height":12,
+                "speed":500,
+                "sine_movement_amplitude":1,
+                "object_of_origin":"Player",
+                "travelTimeTimeLimit":0.5,
+                "rotation_speed":0,
+                "damage":300,
+                "zlayer_drawing":1,
+                "img_path":"Sprites/Bullets/Bullet_6x16.png"
+                }
+        
+                                    }    
+            },
+
+    "RobotBoy":
+
+        {
+        "magazine_size":300,
+        "total_ammo_stock":900,
+        "casted_rays":3,
+        "raycast_depth":300,
+        "raycast_width":60,
+        "fire_rate":32,
+        "reload_speed":2,
+        "pullout_time":2,
+        "triggerResetSpeed":0,
+        "name":"RobotBoy",
+        "weight":0.5,
+        "img_path":"Sprites/Miscellaneous/Buildable/RoboBoy_32x32.png",
+        "inWeaponBox":true,
+
+        "projectile_attributes":{
+            "Bullet":{
+
+                "spriteWidth":23,
+                "spriteHeight":36,
+                "hurtbox_width":6,
+                "hurtbox_height":12,
+                "speed":600,
+                "sine_movement_amplitude":1,
+                "object_of_origin":"Player",
+                "movement_type":"normal",
+                "travelTimeTimeLimit":2,
+                "rotation_speed":0,
+                "damage":80,
+                "zlayer_drawing":1,
+                "img_path":"Sprites/Bullets/Bullet_6x16.png"
+                }
+        
+                                    }    
+            },
+
+    
+
+    "RobotBoy2":
+
+        {
+        "magazine_size":1200,
+        "total_ammo_stock":2400,
+        "casted_rays":3,
+        "raycast_depth":300,
+        "raycast_width":60,
+        "fire_rate":32,
+        "reload_speed":2,
+        "pullout_time":2,
+        "triggerResetSpeed":0,
+        "name":"RobotBoy2",
+        "weight":0.5,
+        "img_path":"Sprites/Weapons/Spas_42x15.png",
+        "inWeaponBox":false,
+
+        "projectile_attributes":{
+            "Bullet":{
+
+                "spriteWidth":23,
+                "spriteHeight":36,
+                "hurtbox_width":6,
+                "hurtbox_height":12,
+                "speed":600,
+                "sine_movement_amplitude":1,
+                "object_of_origin":"Player",
+                "movement_type":"normal",
+                "travelTimeTimeLimit":2,
+                "rotation_speed":0,
+                "damage":80,
+                "zlayer_drawing":1,
+                "img_path":"Sprites/Bullets/Bullet_6x16.png"
+                }
+        
+                                    }    
+            }
+}

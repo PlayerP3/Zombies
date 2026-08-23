@@ -1,0 +1,35 @@
+{
+    "wincopy":
+        {
+            "width":1280,
+            "height":720,
+            "zoom":2,
+            "stateZoom":{}
+        },
+
+    "fog_of_war":
+        {
+            "width":1280,
+            "height":720,
+            "zoom":2,
+            "stateZoom":{}
+        },
+
+    "playeroverlay":
+        {
+            "width":1280,
+            "height":720,
+            "zoom":1,
+            "stateZoom":{}
+        },
+
+    "win":
+        {
+            "width":1280,
+            "height":720,
+            "zoom":2,
+            "stateZoom":{"SPLASH":1,
+                        "PAUSED":1,
+                        "GAMEPLAY":2}
+        }
+}

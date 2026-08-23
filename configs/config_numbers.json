@@ -1,0 +1,147 @@
+{
+    "0":{
+        "zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/Numbers/0.png",
+        "img_width":4,
+        "img_height":8,
+        "img_width_scale":1,
+        "img_height_scale":1},
+
+
+    "1":{
+        "zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/Numbers/1.png",
+        "img_width":1,
+        "img_height":8,
+        "img_width_scale":1,
+        "img_height_scale":1},
+
+    "2":{
+        "zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/Numbers/2.png",
+        "img_width":5,
+        "img_height":8,
+        "img_width_scale":1,
+        "img_height_scale":1},
+
+    "3":{
+        "zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/Numbers/3.png",
+        "img_width":5,
+        "img_height":9,
+        "img_width_scale":1,
+        "img_height_scale":1},
+
+    "4":{
+        "zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/Numbers/4.png",
+        "img_width":4,
+        "img_height":5,
+        "img_width_scale":1,
+        "img_height_scale":1},
+
+
+    "5":{
+        "zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/Numbers/5.png",
+        "img_width":4,
+        "img_height":8,
+        "img_width_scale":1,
+        "img_height_scale":1},
+
+
+    "6":{
+        "zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/Numbers/6.png",
+        "img_width":4,
+        "img_height":8,
+        "img_width_scale":1,
+        "img_height_scale":1},
+
+
+    "7":{
+        "zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/Numbers/7.png",
+        "img_width":4,
+        "img_height":8,
+        "img_width_scale":1,
+        "img_height_scale":1},
+
+
+    "8":{
+        "zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/Numbers/8.png",
+        "img_width":4,
+        "img_height":8,
+        "img_width_scale":1,
+        "img_height_scale":1},
+
+    "9":{
+        "zlayer_drawing":1,
+        "rect_colour":"red",
+        "object_of_origin":"Game",
+        "rect_width":23,
+        "rect_height":36,
+        "name":"CurrentHealthHUD",
+
+        "img_path":"Sprites/Miscellaneous/Numbers/9.png",
+        "img_width":32,
+        "img_height":4,
+        "img_width_scale":1,
+        "img_height_scale":1}
+
+    }
