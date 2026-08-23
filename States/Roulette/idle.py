@@ -1,8 +1,9 @@
 import pygame,os,re,math,random,string,sys
 import json
-from ...objectsystem import objectManager
 from pygame.math import Vector2
 from ...statemachine import State
+from ...utils import *
+from ...objectsystem import objectManager
 
 
 class Idle(State):
@@ -13,31 +14,33 @@ class Idle(State):
 
     def enter(self):
 
-        # clear any interacting objs
-        self.parent_node.clear_interactingObj()
+        self.parent_node.interactingObj = None
+        
+        self.parent_node.interactTimer.reset_timer()
 
-        # set new time limit
-        self.parent_node.interactTimer.timer_limit = self.parent_node.stateInteractTimeLimit[self.__class__.__name__.upper()]
+        self.parent_node.interactTimer.timer_limit = self.parent_node.idleInteractTimerLimit
+
+        self.parent_node.animationPlayer.timer_speed = 0
+        self.parent_node.animationPlayer.currentFrameNumber = 0
+        self.parent_node.animationPlayer.reset_timer()
+        
 
     def update(self):
 
         # set sprite sheet to be idle animation
-        self.parent_node.update_data()  
+        # self.parent_node.update_data()  
+        self.parent_node.update_position()
 
         # run move and collide, end condition is in here
         self.parent_node.move_and_collide()  
 
         # draw surface
         self.parent_node.submit_to_render()
-        
-        # if interacting obj then start interating timer
-        self.parent_node.run_interaction_timer()
 
-        # run end contiion
+        self.parent_node.run_interaction_timer()
+       
         self.end_condition()
 
-
-    # if player in surrounding objects
     # wall collision check
     def collision_check(self,axis:str='y'):
 
@@ -102,13 +105,17 @@ class Idle(State):
             return
 
         # display message
+        # self.parent_node.display_message.hurtbox.center = (game_object.hurtbox.topright[0] + 15,game_object.hurtbox.topright[1] - 15) 
         self.parent_node.display_message.submit_to_render()
 
-        
 
     # end condition
     def end_condition(self):
-        
+
+        # pay up
         if self.parent_node.interactTimer.timer_complete:
 
-            self.parent_node.pay(gameobj=self.parent_node.interactingObj)
+            # make it so that the only thing that can take from the roulette is what paid for it
+            self.parent_node.purchasingObj = self.parent_node.interactingObj
+
+            self.emit('CYCLING')

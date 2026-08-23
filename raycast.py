@@ -1,8 +1,8 @@
 import random,math,string
 from pygame.math import Vector2
-from engine.objectsystem import objectManager
-from engine.utils import *
-from engine.screen import gameScreen
+from .objectsystem import objectManager
+from .utils import *
+from .screen import gameScreen
 
 
 class Raycast():
@@ -262,7 +262,7 @@ class Raycast():
         
     def draw_polygon(self,asset_type:str='polygon',game_object_origin:str='game',is_animated:bool=False,
                     animation_length:int=0,position:tuple=(0,0),value:int=0,is_critical:bool=False,initial_width:int=0,initial_height:int=0,endpoints:list=[],
-                    zlayer:int=1,alpha:int=255,ignore_offset:bool=False):
+                    zlayer:int=1,alpha:int=1,ignore_offset:bool=False):
 
         # pos_rect = gameScreen.windows['win'].win.get_frect(center=position)
 
@@ -321,7 +321,7 @@ class Raycast():
                                                         'sin_waveX':0,
                                                         'sin_waveX_movement':random.choice(['positive','negative']),
                                                         'scale_factor_timer':1,
-                                                        'alpha_value':255,
+                                                        'alpha_value':1,
                                                         'startpos':startpos,
                                                         'endpos':endpos,
                                                         'schedule_deletion':True}

@@ -1,9 +1,9 @@
 import pygame,random,json,os,math,sys
 from pygame.math import Vector2
-from engine.moveableobject import Moveable_Object
-from engine.utils import *
-from engine.timer import Timer
-from engine.objectsystem import objectManager
+from .moveableobject import Moveable_Object
+from .utils import *
+from .timer import Timer
+from .objectsystem import objectManager
 
 # from statemachine import StateMachine
 
@@ -14,14 +14,23 @@ class Weapon():
 
     def __init__(self,name:str='Weapon',magazine_size:int=8,total_ammo_stock:int=0,select_fire:str='fullauto',
                  
-                fire_rate:float=2,reload_speed:float=3,
+                fire_rate:float=2,reload_speed:float=3,triggerResetSpeed:float=0,weight:float=0.1,
                 
                 casted_rays:int=2,raycast_depth:int=1,raycast_width:int=1,raycast_angle_offset:int=0,
                 
-                shot_spread_pattern:str='perfect',shot_spread_number:int=0,is_dual_wield:bool=False):
+                shot_spread_pattern:str='perfect',shot_spread_number:int=0,is_dual_wield:bool=False,dualWieldCopy:str='same',img_path:str='',
+
+                inWeaponBox:bool = True):
 
         self.name = name
+        self.weight = weight
 
+        # if same we keep the same gun obj and just have a different sprite where bullets come out from
+        # if unique we make a new weapon for the right hand
+        self.dualWieldCopy = dualWieldCopy
+
+
+        self.img_path = img_path
         self.fire_rate = fire_rate
         self.reload_speed = reload_speed
         self.magazine_size = magazine_size
@@ -50,6 +59,9 @@ class Weapon():
         # before being added to the active pool, the bullet object first needs to get through this queue
         self.projectile_queue = []
 
+        # trigger reset speeed contorls tbns
+        self.triggerResetSpeed = triggerResetSpeed
+
         # timers
         self.shooting_timer = Timer(timer_replay=True)
         self.reloading_timer = Timer()
@@ -59,6 +71,9 @@ class Weapon():
         self.raycast_depth = raycast_depth
         self.raycast_width = raycast_width
         self.raycast_angle_offset = raycast_angle_offset
+
+        # whether it appear in weapon box or not
+        self.inWeaponBox = inWeaponBox
 
         # store attributes for different projectiles
         self.projectile_attributes = {}
@@ -126,6 +141,8 @@ class Weapon():
                 # now ensure the max ammo capacity never goes below 0
                 self.total_ammo_stock = max(0,self.total_ammo_stock)
 
+    
+
     # can shot be fired for normal gun shooting
     def can_shot_be_fired(self) -> bool:
 
@@ -137,93 +154,7 @@ class Weapon():
         # self.adjust_dual_wield_position(player=player,win=win)
 
         # if the gun is full auto
-        if self.select_fire == 'fullauto':
-
-            # prevent shooting if the time between shots hasnt been reached yet
-            # if not self.shooting_timer.timer_complete:
-            #     pass
-
-            # start deducting from the time between shots
-            # if the player is shooting and there are entities in the inactive pool and self.inactive_pool and (self.total_ammo_stock != 0 and self.bullets_remaining_in_mag != 0)
-            if self.is_shooting:
-
-                # then actually take the shot before the time is subtracted and not self.is_reloading
-                # and also if the player is not reloading,
-                # only check for avaible entities if there are actual bullets in the mag
-                if (self.shooting_timer.timer_complete) and not self.is_reloading and (self.bullets_remaining_in_mag > 0):
-
-                    # self.init_projectiles()
-
-                    # variable which gives possible end points for bullets and the ray number it is on as well 
-                    raynumber_endpoint = find_raycast(number_of_casted_rays=self.casted_rays, raycast_depth=self.raycast_depth,
-                                                            raycast_width=self.raycast_width,starting_point=self.wielded_by.hurtbox.center,target_point=self.wielded_by.shooting_target_position,
-                                                            raycast_angle_offset=self.raycast_angle_offset)
-
-                    # this stores the middle line/end point
-                    self.final_endpoints = [raynumber_endpoint[ind] for ind in find_median_values(array_of_values=raynumber_endpoint.keys(),number_to_return=1)] # return as many end points as there are bullets to be shot, so the number of spread per shot plus 1 for the main bullet, or better yet the numebr of fov rays
-                    
-                    # if there are spread shots
-                    if self.shot_spread_number > 0:
-
-                        # if spread pattern is perfect
-                        if self.shot_spread_pattern == 'perfect':
-
-                            # if spread pattern perfect, the final endpoints variable has endpoints that are arranged starting from the middle line
-                            # so all we need to do is get a list of endpoints the size of the number of spread bullets and without the first element in the final endpoints list
-                            # self.spread_final_endpoints = self.final_endpoints[1:self.number_of_spread_bullets_per_shot+1]
-                            self.spread_final_endpoints = [raynumber_endpoint[ind] for ind in find_median_values(array_of_values=raynumber_endpoint.keys(),number_to_return=self.shot_spread_number+1)] # gave it plus 1 because the middle line is returned but it will be removed in the next line of code
-
-                            # if middle line in final endpoints then remove it
-                            if self.final_endpoints[0] in self.spread_final_endpoints:
-                                self.spread_final_endpoints.remove(self.final_endpoints[0])
-
-                        # elif the pattern si random
-                        elif self.shot_spread_pattern == 'random':
-
-                            # then we take a random sample from the possible rays provided, again here we dont care about
-                            # in the returned rays, do not include the middle line
-                            self.spread_final_endpoints = random.sample([raynumber_endpoint[ind] for ind in find_median_values(array_of_values=raynumber_endpoint.keys(),number_to_return=self.casted_rays) if raynumber_endpoint[ind] != self.final_endpoints[0]],self.shot_spread_number)
-
-                            # if middle line in final endpoints then remove it
-                            if self.final_endpoints[0] in self.spread_final_endpoints: # code might be buggy in that we dont need to get rid of the line but change it to smth else so the right amount of bullets still come out
-                                self.spread_final_endpoints.remove(self.final_endpoints[0])
-
-
-
-                    # do a quick check if there the whole magazine size has been fired, if it has then force a reload
-                    if self.bullets_remaining_in_mag == 0: # here bullets being 0 means that all has been fired
-
-                        # check we have reserve bullets to actually do reloading
-                        if self.total_ammo_stock > 0:
-
-                            # if we do have ammo then reload
-                            self.is_reloading = True
-
-                            return
-
-                # # then actually take the shot before the time is subtracted and not self.is_reloading
-                # # and also if the player is not reloading,
-                # # only check for avaible entities if there are actual bullets in the mag
-                # if (self.shooting_timer.timer_complete) and not self.is_reloading and (self.bullets_remaining_in_mag > 0):
-
-                    self.init_projectiles()
-
-                # run timer
-                # run timer
-                self.shooting_timer.run_timer()
-
-    # can shot be fired for normal gun shooting
-    def can_shot_be_fired2(self) -> bool:
-
-        # calculate bullet start pos
-        # self.find_bullet_start_point(start=self.hurtbox.center,target=self.wielded_by.shooting_target,
-        #                              depth_end=self.hurtbox.topleft)
-
-        # determines where the bullets originate from
-        # self.adjust_dual_wield_position(player=player,win=win)
-
-        # if the gun is full auto
-        if self.select_fire == 'fullauto':
+        if self.select_fire in ['semiauto','fullauto','pumpaction']:
 
             # prevent shooting if the time between shots hasnt been reached yet
             # if not self.shooting_timer.timer_complete:
@@ -455,13 +386,16 @@ class Weapon():
 
 class Bullet(Moveable_Object):
 
-    def __init__(self,pathing:str=None,motion_stop:float=-1,homing:bool=False,stop_at_target_position:bool=False):
+    def __init__(self,pathing:str=None,motion_stop:float=-1,homing:bool=False,stop_at_target_position:bool=False,travelTimeTimeLimit:float=0):
         
         # time until bullet become active and is removed from projectile queue
         self.time_until_active_timer = Timer(timer_limit=0)
 
         # timer for 
         self.travelTimeTimer = Timer()
+
+        # trvael time time limit
+        self.travelTimeTimeLimit = travelTimeTimeLimit
 
         # pathing var
         self.pathing = pathing
@@ -482,6 +416,7 @@ class Bullet(Moveable_Object):
 
     def init(self):
 
+        self.travelTimeTimer.timer_limit = self.travelTimeTimeLimit
         self.travelTimeTimer.timer_init()
 
         super().init()
@@ -548,7 +483,7 @@ class Bullet(Moveable_Object):
     # handle collision damage etc
     def handle_collision(self,game_object:object,axis:str):
 
-        if not self.is_active:
+        if not self.is_active or not game_object.is_active:
             return
 
         # set damage variable by checking if there was a crit
@@ -575,26 +510,27 @@ class Bullet(Moveable_Object):
                     self.apply_damage(gameobj=game_object,damage=damage)
                     
 
-            if game_object.object_of_origin == 'Game':
+            # if game_object.object_of_origin == 'Game':
 
-                if game_object.__class__.__name__ == 'Wall':
+            #     if game_object.__class__.__name__ == 'Wall':
 
-                    if axis == 'x':
-                        if self.movement[0] < 0:
-                            self.hurtbox.left = game_object.hurtbox.right
+            #         if axis == 'x':
+            #             if self.movement[0] < 0:
+            #                 self.hurtbox.left = game_object.hurtbox.right
 
-                        elif self.movement[0] > 0:
-                            self.hurtbox.right = game_object.hurtbox.left
+            #             elif self.movement[0] > 0:
+            #                 self.hurtbox.right = game_object.hurtbox.left
 
-                    elif axis == 'y':
-                        if self.movement[1] < 0:
-                            self.hurtbox.top = game_object.hurtbox.bottom
+            #         elif axis == 'y':
+            #             if self.movement[1] < 0:
+            #                 self.hurtbox.top = game_object.hurtbox.bottom
 
-                        if self.movement[1] > 0:
-                            self.hurtbox.bottom = game_object.hurtbox.top
+            #             if self.movement[1] > 0:
+            #                 self.hurtbox.bottom = game_object.hurtbox.top
 
             if game_object.object_of_origin == 'Player':
                 return
+            
         # if not piercing
         self.is_active = False
 
@@ -606,22 +542,23 @@ class Bullet(Moveable_Object):
 
         if gameobj.health <= 0:
             self.projectile_manager.wielded_by.money += self.moneyOnKill
+            gameobj.is_active = False
 
         elif gameobj.health > 0:
             self.projectile_manager.wielded_by.money += self.moneyOnHit
 
 
         # # init damage number
-        # if engine.display_dmg_num == 1:
-        #     dmgnum = engine.inactive_pool['DamageNumber'][0]
+        # if pynaccle.display_dmg_num == 1:
+        #     dmgnum = pynaccle.inactive_pool['DamageNumber'][0]
         #     dmgnum.init(f"{damage}")
         #     dmgnum.spawn(gameobj.hurtbox.center)
         #     dmgnum.update_movement_vectors(unique_id='movement',direction_vectorX=0,
         #                                     direction_vectorY=-1,acceleration=self.acceleration,Xcceleration_rate=0,
         #                                     Xcceleration_rate_change='negative',
         #                                     max_value=self.acceleration,reduce_on_wall_collision=False,reset_on_max_value=False)
-        #     engine.inactive_pool['DamageNumber'].remove(dmgnum)
-        #     engine.active_pool.append(dmgnum)
+        #     pynaccle.inactive_pool['DamageNumber'].remove(dmgnum)
+        #     pynaccle.active_pool.append(dmgnum)
 
 
 
@@ -634,6 +571,13 @@ class Bullet(Moveable_Object):
             # update position
             self.update_position()
 
+            # draw surface
+            # self.draw_surface(position=self.hurtbox.center)
+            self.submit_to_render()
+
+            # self.draw_rect(position=self.hurtbox.center)
+
+            # self.draw_hitbox()
 
             # update movement vars
             self.update_movement()
@@ -644,8 +588,5 @@ class Bullet(Moveable_Object):
             # handle how long bullet is allowed to travel for
             self.travel_time()
 
-            # draw surface
-            self.draw_surface(position=self.hurtbox.center)
-
-            self.draw_rect(position=self.hurtbox.center)
+           
 

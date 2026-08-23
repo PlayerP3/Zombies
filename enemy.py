@@ -1,23 +1,17 @@
 import pygame,json
 from pygame.math import Vector2
-from pathfinding import Pathfinding
-from engine.moveableobject import Moveable_Object
-from engine.utils import *
-from engine.statemachine import StateMachine
-from engine.objectsystem import objectManager
-from States.Enemy.idle import Idle
-from States.Enemy.chasing import Chasing
-from States.Enemy.roaming import Roaming
-from States.Enemy.death import Death
+from pynaccle.pathfinding import Pathfinding
+from pynaccle.moveableobject import Moveable_Object
+from pynaccle.utils import *
+from pynaccle.statemachine import StateMachine
+from pynaccle.objectsystem import objectManager
+from .States.Enemy.idle import Idle
+from .States.Enemy.chasing import Chasing
+from .States.Enemy.roaming import Roaming
+from .States.Enemy.death import Death
 
 # from ItemBench import ItemPools,ItemPoolsReset,remove_from_itempool,add_to_itempool
 pygame.font.init()
-
-
-# load in parameters
-with open('config_enemy.json','r') as enemy_attributes_file:
-
-    enemy_parameters = json.load(enemy_attributes_file)
 
 class EnemyStateMachine(StateMachine):
 
@@ -145,5 +139,5 @@ class Enemy(Moveable_Object,Pathfinding,EnemyStateMachine):
             self.draw_rect(position=self.hurtbox.center)
 
 
-objectManager.inactive_pool["Enemy"] = [Enemy() for _ in range(50)]
+
 

@@ -3,11 +3,11 @@
 # always be checking your shortest route with what is at the top of the priority queue
 # # the final graph contains the coordinates for a given node and its object
 
-from engine.utils import *
-from engine.timer import Timer
-from engine.tilemap import tilemapProcessor
-from engine.globs import *
-from engine.objectsystem import objectManager
+from .utils import *
+from .timer import Timer
+from .tilemap import tilemapProcessor
+from .globs import *
+from .objectsystem import objectManager
 # from utils import *
 # from Drawing_TileMaps import engine
 
@@ -131,7 +131,7 @@ class Node():
 
         return total
     
-    # returns a list of neighbourd for a node, it looks for the west, north, east and south only ,all_tiles:dict=engine.accessible_tiles_for_astar
+    # returns a list of neighbourd for a node, it looks for the west, north, east and south only ,all_tiles:dict=pynaccle.accessible_tiles_for_astar
     def find_neighbours(self):
 
         # print(f'These are all the tiles {all_tiles}')
@@ -255,7 +255,7 @@ class Pathfinding():
                 self.pathing_end_position_tile = end
 
         # get astar graph
-        # astar_graph = engine.astar_graph.copy()
+        # astar_graph = pynaccle.astar_graph.copy()
 
         # nodes which we have calculated the f cost for, these are all the neighboiuring nodes for the current node
         # i.e when we are thinking of what should be expanded next, it is the node with the smallest total cost in this list
@@ -340,7 +340,7 @@ class Pathfinding():
             # print(f'List comprehenstion neighbours = {astar_graph[current_node].neighbours}')
             neighbour_nodes = [node for node in tilemapProcessor.astar_graph[current_node].neighbours if node]
 
-            # print(engine.astar_graph[current_node].neighbours)
+            # print(pynaccle.astar_graph[current_node].neighbours)
 
             # print(current_node)
             # print(astar_graph[current_node].neighbours)
@@ -354,7 +354,7 @@ class Pathfinding():
                 # was having a glitch where a node object was being created twice so its previous node was being overwritten, so now we only create one if it hasnt been already created
                 # if node not in created_node_objects:
 
-                #     astar_graph[node] = Node(cost=calculate_manhattan(node,find_tile_centre(point=start_position)),heuristic=calculate_manhattan(node,find_tile_centre(point=pathing_end_position_tile)),topleftcoors=node,neighbours=find_neighbours(current_node=node,all_tiles=engine.accessible_tiles))
+                #     astar_graph[node] = Node(cost=calculate_manhattan(node,find_tile_centre(point=start_position)),heuristic=calculate_manhattan(node,find_tile_centre(point=pathing_end_position_tile)),topleftcoors=node,neighbours=find_neighbours(current_node=node,all_tiles=pynaccle.accessible_tiles))
                 #     created_node_objects.append(node)
 
                 # if the node is in the closed stack meaning it has been selected as the cheapest in an expansion and been moved to already then ignore it because we dont move back in the graph
@@ -370,7 +370,7 @@ class Pathfinding():
                 if (neighbour not in open_stack or (tilemapProcessor.astar_graph[neighbour].total < tilemapProcessor.astar_graph[current_node].total)) and tilemapProcessor.astar_graph[neighbour].clearance > self.clearance:
 
                     # print(neighbour)
-                    # print(engine.astar_graph[neighbour].clearance)
+                    # print(pynaccle.astar_graph[neighbour].clearance)
                     # print(self.clearance)
                     # make the parent of the node be the current node right now
                     # astar_graph[current_node].previous_node = node
@@ -704,6 +704,7 @@ class Pathfinding():
 
 
     def draw_pathing(self):
+        return
 
         if len(self.pathing) >= 2:
 

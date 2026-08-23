@@ -1,17 +1,18 @@
 import pygame,os,re,sys
 from pygame.math import Vector2
-from raycast import Raycast
-from game import engine
-from animatedsprite import AnimatedSprite
-from globs import delta
-# from miscsprites import MiscellaneousInactivePools,MiscellaneousMgr
-from utils import *
+from .raycast import Raycast
+from .animatedsprite import AnimatedSprite
+from .globs import delta,FPS
+from .objectsystem import objectManager
+from .utils import *
+from .hitbox import *
 import random
 import math
 import json
 import string
 import copy
 import numpy as np
+
 # from A_star_search_algorithm import *
 
 # pygame.font.init()
@@ -42,9 +43,9 @@ class Moveable_Object(AnimatedSprite):
 
                  max_acceleration:float=1,min_acceleration:float=0,invincibility_duration:float=0,
 
-                 score_multiplier:int=1,action_every_X_frames:float=1,
+                 score_multiplier:int=1,action_every_X_frames:float=1,connectedChunk:str="0",
 
-                 ranged_dot_effects:dict={}):
+                 ranged_dot_effects:dict={},inaccessible:bool=True):
 
         
 
@@ -115,7 +116,7 @@ class Moveable_Object(AnimatedSprite):
         self.damage = damage
         self.damage_multiplier = damage_multiplier
         self.damage_resistance = damage_resistance
-        self.action_every_X_frames = action_every_X_frames/engine.FPS
+        self.action_every_X_frames = action_every_X_frames/FPS
         self.critical_chance = critical_chance
         self.critical_multiplier = critical_multiplier
 
@@ -152,12 +153,14 @@ class Moveable_Object(AnimatedSprite):
         self.allowed_collisions = allowed_collisions
         self.can_collide = can_collide
         self.collision_type = collision_type
+        self.inaccessible = inaccessible
 
         # movement vectoirs stored here
         self.movement_vectors = {} # array of dictionary with keys direction vector X, direction vector Y, and acceleration
 
         # positional variables
         self.current_tile_position = (0,0)
+        self.connectedChunk = connectedChunk
 
         # score variables
         self.score = score
@@ -218,6 +221,9 @@ class Moveable_Object(AnimatedSprite):
 
         # set total health
         self.total_health = self.health
+
+        # load hitboxes
+        self.load_hitboxes()
 
 
         super().init_sprite()
@@ -293,6 +299,45 @@ class Moveable_Object(AnimatedSprite):
             self.direction_vectorX = 0
             self.direction_vectorY = 0
 
+    def load_hitboxes(self):
+
+        if self.img_path in hitboxSystem.metaData:
+
+            # get new dict of frame and hitboxes
+            boxes = {k:v for k,v in hitboxSystem.metaData[self.img_path].items()}
+            out = {}
+
+            # loop through each frame and the hitboxes it comes with
+            for frame,storedHitboxes in boxes.items():
+
+                # add new frame
+                self.hitboxes[int(frame)] = []
+
+                # add each hitbox to the boxes
+                for indvBox in storedHitboxes:
+
+                    splitvars = [float(x) for x in indvBox.split(',')]
+
+                    newBox = Hitbox(*splitvars,frameNumber=int(frame))
+
+                    self.hitboxes[int(frame)].append(newBox)
+
+    # check for hitbox collision and return if collisioon true and the htibox that hit
+    def hitbox_collision(self,game_object):
+
+        collision = False
+        hitbox = None
+
+        # check for collision with hitboxes
+        for hitBox in self.hitboxes[self.currentFrame]:
+            
+            if hitBox.collided(self.hurtbox.center,game_object):
+                collision = True
+                break
+
+        return collision,hitbox
+        
+
 
     # kill object
     def kill(self,active_pool:list,inactive_pool:list):
@@ -315,29 +360,29 @@ class Moveable_Object(AnimatedSprite):
         # normal update if nothing has moved
         if old_tile_position == new_tile_position:
             
-            if old_tile_position not in engine.object_positions:
+            if old_tile_position not in objectManager.object_positions:
 
                 # add the coors and add the object
-                engine.object_positions[old_tile_position] = [self]
+                objectManager.object_positions[old_tile_position] = [self]
 
             # if the coors are already present we just want to add to the list that is already there
-            elif old_tile_position in engine.object_positions:
+            elif old_tile_position in objectManager.object_positions:
 
-                if self not in engine.object_positions[old_tile_position]:
-                    engine.object_positions[old_tile_position].append(self) 
+                if self not in objectManager.object_positions[old_tile_position]:
+                    objectManager.object_positions[old_tile_position].append(self) 
     
         # if the position has changed   
         elif old_tile_position != new_tile_position:
 
             # remove instance of object in old tile position list
-            if old_tile_position in engine.object_positions:
+            if old_tile_position in objectManager.object_positions:
 
-                if self in engine.object_positions[old_tile_position]:
+                if self in objectManager.object_positions[old_tile_position]:
 
-                    engine.object_positions[old_tile_position].remove(self)
+                    objectManager.object_positions[old_tile_position].remove(self)
 
-                if not engine.object_positions[old_tile_position]:
-                    del engine.object_positions[old_tile_position]
+                if not objectManager.object_positions[old_tile_position]:
+                    del objectManager.object_positions[old_tile_position]
 
 
             # add new position and set current tile pos
@@ -346,23 +391,38 @@ class Moveable_Object(AnimatedSprite):
 
             # update the object position
             # check if the coors are in the object position dict already
-            if self.current_tile_position not in engine.object_positions:
+            if self.current_tile_position not in objectManager.object_positions:
 
                 # add the coors and add the object
-                engine.object_positions[self.current_tile_position] = [self]
+                objectManager.object_positions[self.current_tile_position] = [self]
 
             # if the coors are already present we just want to add to the list that is already there
-            elif self.current_tile_position in engine.object_positions:
+            elif self.current_tile_position in objectManager.object_positions:
 
-                if self not in engine.object_positions[self.current_tile_position]:
-                    engine.object_positions[self.current_tile_position].append(self) 
+                if self not in objectManager.object_positions[self.current_tile_position]:
+                    objectManager.object_positions[self.current_tile_position].append(self) 
 
             
     # spawn function
-    def spawn(self,pos:tuple):
+    def spawn(self,pos:tuple,vertice:str="center"):
 
         self.is_active = True
-        self.hurtbox.center = pos
+
+        if vertice == "center":
+            self.hurtbox.center = (pos[0]+self.spawnOffsetX,pos[1]+self.spawnOffsetY)
+
+        elif vertice == "topleft":
+            self.hurtbox.topleft = (pos[0]+self.spawnOffsetX,pos[1]+self.spawnOffsetY)
+
+    # move function
+    def move_to(self,pos:tuple,vertex:str="center"):
+
+        if vertex == "center":
+            self.hurtbox.center = pos
+
+        elif vertex == "topleft":
+            self.hurtbox.topleft = pos
+
 
     # # finding direction vector function, when you have a specific point
     # def find_direction_vector(self,point:tuple):
@@ -782,11 +842,15 @@ class Moveable_Object(AnimatedSprite):
         self.direction_vectorY = 0
         self.collision_vector = Vector2(0,0)
 
-
+    
 
     # wall collision check
     def collision_check(self,axis:str='y'):
-        
+
+        if self.__class__.__name__ == "Wall":
+            return
+
+
         # find surrounding objects
         self.find_surrounding_game_objects()  
 
@@ -794,17 +858,44 @@ class Moveable_Object(AnimatedSprite):
         self_origin_surrounding_objects  = [x for x in self.surrounding_game_objects if x.object_of_origin == self.object_of_origin]  
         different_origin_surrounding_objets = [x for x in self.surrounding_game_objects if x.object_of_origin != self.object_of_origin]  
 
+        
+        # print(objectManager.object_positions[(-224.0, -160.0)])
+        # sys.exit()
         # go through all possible game objects
         for game_object in self.surrounding_game_objects:
 
-            # rect collision check
-            if self.hurtbox.colliderect(game_object.hurtbox):
+            if not game_object.can_collide:
+                continue
 
-                # sprite collision check
-                # if self.mask.overlap(game_object.mask,(game_object.hurtbox.left-self.hurtbox.left,game_object.hurtbox.top-self.hurtbox.top)):
+            # if wall/door use hirtbox collision instead of hitbox
+            if array_is_in_array(get_mro(gameObject=game_object),['Wall','Interactable']): 
 
-                # handle collision
-                self.handle_collision(game_object=game_object,axis=axis)
+                # rect collision check
+                if self.hurtbox.colliderect(game_object.hurtbox):
+
+                    # handle collision
+                    self.handle_collision(game_object=game_object,axis=axis)
+
+
+            else:
+                collision = False
+                
+                # check for collision with hitboxes
+                for hitBox in self.hitboxes[self.currentFrame]:
+                    
+                    if hitBox.collided(self.hurtbox.center,game_object):
+                        collision = True
+                        break
+
+                if collision:
+
+                    self.handle_collision(game_object=game_object,axis=axis)
+
+                    
+
+
+    # extra collision processing 
+                
 
     # handle collision once the check is confirmed
     def handle_collision(self,game_object:object,axis:str):
@@ -838,6 +929,7 @@ class Moveable_Object(AnimatedSprite):
     # function for both movement and collisions
     def move_and_collide(self):
 
+        
         # store position before movement
         position_before_movement = self.hurtbox.center
         target_point = None
@@ -1168,13 +1260,13 @@ class Moveable_Object(AnimatedSprite):
         # reset surrounding objects
         self.surrounding_game_objects = []
 
-        for coors in engine.object_positions:
+        for coors in objectManager.object_positions:
 
             # add game object if it is within the boundaries
             if (Vector2(self.hurtbox.center) - Vector2(coors)).length() <= self.x_metres_before_collision_detection:
 
                 # possible entities that can collide with the bullet
-                self.surrounding_game_objects.extend(engine.object_positions[coors])
+                self.surrounding_game_objects.extend(objectManager.object_positions[coors])
 
         # filter out game objects based on if they are a target for the projectile
         self.surrounding_game_objects = [x for x in self.surrounding_game_objects if x.is_active and id(x) != id(self)]
@@ -1182,23 +1274,42 @@ class Moveable_Object(AnimatedSprite):
         # remove duplicates
         self.surrounding_game_objects = list(set(self.surrounding_game_objects))
 
+        # reorder so walls are at the end
+        walls = [x for x in self.surrounding_game_objects if x.__class__.__name__ == 'Wall']
+        nowalls = [x for x in self.surrounding_game_objects if x.__class__.__name__ != 'Wall']
+
+        nowalls.extend(walls)
+        self.surrounding_game_objects = nowalls
+
+    def filter_surrounding_game_objects(self,classes:list,deep:bool=False):
+
+        # we look at mro 
+        if deep:
+            pass
+
+        elif not deep:
+
+            self.surrounding_game_objects = [x for x in self.surrounding_game_objects if x.__class__.__name__ in classes]
+
+    
+
     # apply damage function, handles death too
-    def apply_damage(self,gameobj:Moveable_Object,damage:float):
+    def apply_damage(self,gameobj,damage:float):
 
         gameobj.health -= damage
         gameobj.health = max(0,gameobj.health)
 
         # init damage number
-        if engine.display_dmg_num == 1:
-            dmgnum = engine.inactive_pool['DamageNumber'][0]
-            dmgnum.init(f"{damage}")
-            dmgnum.spawn(gameobj.hurtbox.center)
-            dmgnum.update_movement_vectors(unique_id='movement',direction_vectorX=0,
-                                            direction_vectorY=-1,acceleration=self.acceleration,Xcceleration_rate=0,
-                                            Xcceleration_rate_change='negative',
-                                            max_value=self.acceleration,reduce_on_wall_collision=False,reset_on_max_value=False)
-            engine.inactive_pool['DamageNumber'].remove(dmgnum)
-            engine.active_pool.append(dmgnum)
+        # if pynaccle.display_dmg_num == 1:
+        #     dmgnum = pynaccle.inactive_pool['DamageNumber'][0]
+        #     dmgnum.init(f"{damage}")
+        #     dmgnum.spawn(gameobj.hurtbox.center)
+        #     dmgnum.update_movement_vectors(unique_id='movement',direction_vectorX=0,
+        #                                     direction_vectorY=-1,acceleration=self.acceleration,Xcceleration_rate=0,
+        #                                     Xcceleration_rate_change='negative',
+        #                                     max_value=self.acceleration,reduce_on_wall_collision=False,reset_on_max_value=False)
+        #     pynaccle.inactive_pool['DamageNumber'].remove(dmgnum)
+        #     pynaccle.active_pool.append(dmgnum)
 
 
 
@@ -1303,8 +1414,10 @@ class Moveable_Object(AnimatedSprite):
 
                 self.apply_damage(gameobj=gobj,damage=self.damage)
                 
-
-
+    # what to do with object when not in frame
+    def out_of_frame(self):
+        
+        return 'kill'
 
     def apply_powerup_effect(self,pup:object):
 
@@ -1350,7 +1463,7 @@ class Moveable_Object(AnimatedSprite):
         self.current_tile_position = find_tile_topleft(point=self.hurtbox.center)
 
         # add current tile position to
-        engine.update_object_positions(coors=self.current_tile_position,object_to_add=self)
+        objectManager.update_object_positions(coors=self.current_tile_position,object_to_add=self)
     
 
 
@@ -1414,7 +1527,7 @@ class DamageNumber(Moveable_Object):
 
         self.init_text_sprite(f"{text}")
         self.init_sprite()
-        self.alpha = 255
+        self.alpha = 1
         self.is_active = True
         self.hurtbox.center = (0,0)
         self.timer_speed = 4
@@ -1435,18 +1548,18 @@ class DamageNumber(Moveable_Object):
         
 
 # add the card inactive pool to the object that stores all the pools for different projectiles/on shot effects
-engine.inactive_pool["DamageNumber"] = [DamageNumber() for _ in range(300)]
+objectManager.inactive_pool["DamageNumber"] = [DamageNumber() for _ in range(300)]
 
 
 # code to show damage numbers
 # event processing for shooting
-def display_dmg_num_event(event:pygame.Event):
+# def display_dmg_num_event(event:pygame.Event):
 
-    # handling mouse clicks
-    if event.type == pygame.KEYDOWN:
+#     # handling mouse clicks
+#     if event.type == pygame.KEYDOWN:
 
-        if event.key == pygame.K_c:
+#         if event.key == pygame.K_c:
 
-           engine.display_dmg_num *= -1
+#            pynaccle.display_dmg_num *= -1
 
-engine.extra_event_processing.append(display_dmg_num_event)
+# pynaccle.extra_event_processing.append(display_dmg_num_event)

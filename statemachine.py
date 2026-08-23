@@ -3,8 +3,8 @@ import json
 from pygame.math import Vector2
 from pygame.event import Event
 # from game import engine
-from eventsystem import eventprocessor
-from timer import Timer
+from .eventsystem import eventprocessor
+from .timer import Timer
 # from States.Player.idle import Idle
 
 
@@ -36,11 +36,10 @@ class StateMachine():
 
     def update(self):
 
-        if self.state.done:
-            self.transition_to_next_state()
-
         self.state.update()
 
+        if self.state.done:
+            self.transition_to_next_state()
 
     def unhandled_events(self,event):
 
@@ -72,8 +71,6 @@ class State(Timer):
         self.next_state = state
         self.done = True
 
-        pass
-
     def completed(self):
 
         # if something then set new state
@@ -89,13 +86,9 @@ class State(Timer):
 
         pass
 
-
-
     def submit_event_processing(self):
 
         eventprocessor.extra_event_processing.append(self.handle_event)
-
-
 
     def end_condition(self):
 
