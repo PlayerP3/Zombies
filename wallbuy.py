@@ -26,6 +26,8 @@ class Wallbuy(Interactable):
         self.display_message.update_message(f"Hold E to buy {self.name} [Cost:{self.weaponCost}]")
         self.display_message.init()
 
+        
+
     # what happens when pickup is done like changing stats etc
     def pay(self,gameobj):
 
@@ -61,5 +63,5 @@ class Wallbuy(Interactable):
             self.cost = self.weaponCost
             self.display_message.update_message(f"Hold E to buy {self.name} [Cost:{self.cost}]")
 
-    
+        self.update_position()
 

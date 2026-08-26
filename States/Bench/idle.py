@@ -24,6 +24,7 @@ class Idle(State):
         # init item sprite
         if self.parent_node.can_upgrade:
             self.parent_node.buildableSprite.hurtbox.center = (self.parent_node.hurtbox.centerx,self.parent_node.hurtbox.centery - 14)
+
         
 
     def update(self):

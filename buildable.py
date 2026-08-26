@@ -149,6 +149,8 @@ class Bench(Interactable):
 
         give_weapon(gameobj=gameobj,weaponName=self.buildableObject,weaponClass=Gun,weaponParams=gun_parameters)
 
+        
+
     # swap weapon function
     # def give_weapon(self,gameobj):
 
