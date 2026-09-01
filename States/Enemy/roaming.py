@@ -1,8 +1,8 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
-from engine.objectsystem import objectManager
+from pynaccle.statemachine import State
+from pynaccle.objectsystem import objectManager
 
 
 class Roaming(State):
@@ -39,14 +39,15 @@ class Roaming(State):
 
         # update pathing and cache
         self.parent_node.update_pathing_and_cache()
-        self.parent_node.draw_pathing()
+        # self.parent_node.draw_pathing()
 
         # # movement
         self.parent_node.move_and_collide()
 
         # draw surface
-        self.parent_node.draw_surface(position=self.parent_node.hurtbox.center)
-        self.parent_node.draw_rect(position=self.parent_node.hurtbox.center)
+        self.parent_node.submit_to_render()
+        # self.parent_node.draw_surface(position=self.parent_node.hurtbox.center)
+        # self.parent_node.draw_rect(position=self.parent_node.hurtbox.center)
 
         self.end_condition()
     

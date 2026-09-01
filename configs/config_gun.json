@@ -12,7 +12,7 @@
         "pullout_time":2,
         "triggerResetSpeed":0,
         "name":"AssaultRifle",
-        "weight":52.5,
+        "weight":0.5,
         "img_path":"Sprites/Weapons/Regular_32x15.png",
         "inWeaponBox":true,
 

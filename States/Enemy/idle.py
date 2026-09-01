@@ -1,8 +1,8 @@
 import pygame,os,re,math,random,string,sys
 import json
 from pygame.math import Vector2
-from engine.statemachine import State
-from engine.objectsystem import objectManager
+from pynaccle.statemachine import State
+from pynaccle.objectsystem import objectManager
 
 class Idle(State):
 
@@ -43,8 +43,9 @@ class Idle(State):
             self.emit('CHASING')
 
         # draw surface
-        self.parent_node.draw_surface(position=self.parent_node.hurtbox.center)
-        self.parent_node.draw_rect(position=self.parent_node.hurtbox.center)
+        self.parent_node.submit_to_render()
+        # self.parent_node.draw_surface(position=self.parent_node.hurtbox.center)
+        # self.parent_node.draw_rect(position=self.parent_node.hurtbox.center)
 
         # update position
         self.parent_node.update_position()
