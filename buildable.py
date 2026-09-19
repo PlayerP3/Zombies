@@ -84,7 +84,6 @@ class Bench(Interactable):
         # parts needed to buidl and name of what the bench builds
         self.partsNeeded = partsNeeded
         self.buildableObject = buildableObject
-        self.buildableData = {}
         self.buildableBuilt = False
         self.buildableTaken = False
         self.buildableSprite = None

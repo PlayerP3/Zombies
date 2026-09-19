@@ -23,13 +23,15 @@ from soulbox import Soulbox,Soul
 from pynaccle.chunks import Chunk
 from pynaccle.roulette import Roulette
 from weaponbox import Weaponbox
+# from pynaccle.utils import *
 
 
 # init engine
 core = Pyn.Engine()
 
 core.init(states={'SPLASH':Splash(),'GAMEPLAY':Gameplay(),'PAUSED':Paused(),'QUIT':Quit()},
-          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall,'SpawnPoint':SpawnPoint,'Bench':Bench,'Soulbox':Soulbox,'Chunk':Chunk,'Roulette':Roulette,'Weaponbox':Weaponbox},hitboxMetadataJSON='configs/config_hitboxes.json')
+          classMappings={'Wallbuy':Wallbuy,'BgTile':AnimatedSprite,'Door':Door,'Wall':Wall,'SpawnPoint':SpawnPoint,'Bench':Bench,'Soulbox':Soulbox,'Chunk':Chunk,'Roulette':Roulette,'Weaponbox':Weaponbox},hitboxMetadataJSON='configs/config_hitboxes.json',
+          configs=['configs/config_player.json','configs/config_hud_elements.json','configs/config_buildable.json'])
 
 # spawn initial bg objects
 for chunk in core.tilemapProcessor.openChunks:
@@ -70,10 +72,11 @@ from pynaccle.objectsystem import objectManager
 import wallbuy
 from wall import *
 from pynaccle.pathfinding import Pathfinding,build_astar_graph,build_true_clearance_graph
+from quest import *
 
 # set random seed
 random.seed()
-
+    
 # load files in
 with open('configs/config_player.json','r') as player_attributes_file, open('configs/config_hud_elements.json','r') as hudelements_attributes_file, \
     open('configs/config_buildable.json','r') as buidlable_attributes_file:
@@ -81,6 +84,8 @@ with open('configs/config_player.json','r') as player_attributes_file, open('con
     player_parameters = json.load(player_attributes_file)
     hudelements_parameters = json.load(hudelements_attributes_file)
     buildable_parameters = json.load(buidlable_attributes_file)
+
+
 
 
 # add objects to inactive pool
@@ -199,20 +204,21 @@ def run():
     # load buildables
     buildableData = {}
 
-    for buildable in buildable_parameters:
+    # for buildable in buildable_parameters:
+    for buildable in core.configData.loadedConfigs['buildable']:
 
         # add image path
-        buildableData[buildable] = buildable_parameters[buildable]['img_path']
+        # buildableData[buildable] = buildable_parameters[buildable]['img_path']
 
         # add as key in player collected parts
         player.collectedParts[buildable] = []
         
-        for bPart in buildable_parameters[buildable]["Parts"]:
+        for bPart in core.configData.loadedConfigs['buildable'][buildable]["Parts"]:
 
             # init and spawn part
             gameobj = Part()
 
-            set_attributes(game_object=gameobj,attributes=buildable_parameters[buildable]["Parts"][bPart])
+            set_attributes(game_object=gameobj,attributes=core.configData.loadedConfigs['buildable'][buildable]["Parts"][bPart])
             gameobj.init()
             gameobj.spawn(pos=gameobj.spawnLocation)
 
@@ -223,9 +229,21 @@ def run():
             core.tilemapProcessor.chunkObj[gameobj.connectedChunk].append(gameobj)
 
     # if there are any work benches inject buildable data into them
-    workbenches = core.tilemapProcessor.get_obejcts(className="Bench")
-    for wb in workbenches:
-        wb.buildableData = buildable_parameters
+    # workbenches = core.tilemapProcessor.get_obejcts(className="Bench")
+    # for wb in workbenches:
+    #     wb.buildableData = buildable_parameters
+        
+        
+        
+    # build quests
+    
+    # get tasks 
+    # task1 = FindParts()
+    # myQuest = Quest()
+    
+    
+        
+    # start game
 
     core.state.enter()
 
