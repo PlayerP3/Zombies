@@ -25,3 +25,4 @@ class Window():
         self.win = pygame.Surface((self.win_width,self.win_height),pygame.SRCALPHA)
         self.win_copy = pygame.Surface((self.win_width,self.win_height),pygame.SRCALPHA)
         self.fog_of_war_surface = pygame.Surface((self.win_width,self.win_height),pygame.SRCALPHA)
+        

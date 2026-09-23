@@ -20,34 +20,15 @@ pygame.font.init()
 # self.left_hand_weapon_slots[self.weapon_choice] returns weapon object if the slot is filled
 
 
-class PlayerStateMachine(StateMachine):
-
-    def __init__(self):
-
-        StateMachine.__init__(self)
-
-    def update(self):
-
-        if self.state.done:
-            self.transition_to_next_state()
-
-        self.state.update()
-
-        # print(self.state.__class__.__name__)
-
-        # update position
-        self.update_position()
-
-        # self.draw_surface(position=self.hurtbox.center)
+    
 
 
 
-class Player(Moveable_Object,PlayerStateMachine):
+class Player(Moveable_Object,StateMachine):
 
     def __init__(self):
 
         Moveable_Object.__init__(self)
-        PlayerStateMachine.__init__(self)
 
         # movement
         self.movementx = [0,0] # index 0 is no movememnt, -1 left, 1 right
@@ -86,6 +67,10 @@ class Player(Moveable_Object,PlayerStateMachine):
         self.weapon = None
         self.inventory.inventory['weapons'] = []
         give_weapon(gameobj=self,weaponName=self.starting_weapon,weaponClass=Gun,weaponParams=gun_parameters)
+        
+    
+
+
 
     # function to link set attirbutes, init and storing original values on obj start
     def start(self,attributes:dict):
@@ -195,3 +180,17 @@ class Player(Moveable_Object,PlayerStateMachine):
     def swap_weapon(self):
 
         swap_weapon(self)
+        
+    def update(self):
+
+        if self.state.done:
+            self.transition_to_next_state()
+
+        self.state.update()
+
+        # print(self.state.__class__.__name__)
+
+        # update position
+        self.update_position()
+    
+        # self.draw_surface(position=self.hurtbox.center)

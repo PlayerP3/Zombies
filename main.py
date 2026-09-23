@@ -201,9 +201,6 @@ def run():
     core.objectManager.active_pool.append(player)
     core.objectManager.active_pool.append(round_manager)
 
-    # load buildables
-    buildableData = {}
-
     # for buildable in buildable_parameters:
     for buildable in core.configData.loadedConfigs['buildable']:
 
@@ -239,10 +236,21 @@ def run():
     
     # get tasks 
     # task1 = FindParts()
-    # myQuest = Quest()
+    # task1.buildableObject = 'RobotBoy'
+    
+    # task2 = BuildWeapon()
+    # task2.buildableObject = 'RobotBoy'
+    
+    # task3 = PickUpWeapon()
+    # task3.buildableObject = 'RobotBoy'
+    
+    # tasks = [task1,task2,task3]
+    
     
     
         
+    # give quest to player
+     
     # start game
 
     core.state.enter()

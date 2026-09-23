@@ -107,6 +107,8 @@ class Bench(Interactable):
                                 'IDLE':1,
                                 'BUILDABLEBUILT':1,
                                 'BUILDABLETAKEN':1}
+    
+
         
     def init(self):
 
